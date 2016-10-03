@@ -134,7 +134,7 @@ button {
     display: flex;
     flex-direction: row;
 
-    position: absolute;
+    position: fixed;
     top: 72px;
     right: 0;
 }
@@ -218,6 +218,9 @@ button {
 }
 
 @media (max-width: 870px) {
+    .header__top-bar {
+        right: 0;
+    }
     .navigation {
         position: fixed;
         top: 0;
