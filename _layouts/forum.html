@@ -1,0 +1,56 @@
+{% assign path = page.url | replace_first: "/", "" | split: "/" %}
+{% assign last = path | last %} 
+{% assign url = "" %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include head.html head=page.head %}
+
+    <link rel="stylesheet" href="/css/forum.css" async>
+</head>
+
+<body>
+    {% include header.html 
+        title=page.header.title
+        image=page.header.image 
+        color=page.header.color 
+        width=page.header.width 
+        height=page.header.height 
+        url=page.baseUrl
+    %}
+
+    <section class="breadcrumb">
+        <a href="/">Home</a>
+        <span>/</span>
+        {% for piece in path %}
+            {% assign url = url | append: "/" | append: piece | downcase %}
+            {% if piece != last %}
+                <a href="{{ url }}">{{ piece }}</a>
+                <span>/</span>
+            {% else %}
+                <p>{{piece}}</p>
+            {% endif %}
+        {% endfor %}
+    </section>
+
+    <div class="wrapper">
+        <nav class="navigation card">
+            <button class="navigation__close-nav-button" hidden>
+                <img src="/assets/ic_menu_black_24px.svg" alt="close menu">
+            </button> 
+ 
+            {% for link in site.forumLinks %}
+            <a href="{{ page.baseUrl }}{{ link | downcase | replace: ' ', '-' }}">{{ link }}</a> 
+            {% endfor %} 
+
+        </nav>
+
+        {{ content }}
+    </div>
+
+    {% include footer.html %}
+</body>
+
+</html>
