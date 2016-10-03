@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% include head.html head=page.head %}
+</head>
+
+<body>
+    {% include header.html 
+        title="The Talk Groups" 
+        image="/assets/tg-logo.jpg" 
+        color="white" 
+        width="1000" 
+        height="304"
+        url="/"
+    %}
+
+    <div class="wrapper">
+        <nav class="navigation card">
+            <button class="navigation__close-nav-button" hidden>
+                <img src="/assets/ic_menu_black_24px.svg" alt="close menu">
+            </button> 
+ 
+            {% for link in site.mainLinks %}
+            <a href="/{{ link | downcase | replace: ' ', '-' }}">{{ link }}</a> 
+            {% endfor %} 
+
+        </nav>
+
+        {{ content }}
+    </div>
+
+    {% include footer.html %}
+</body>
+
+</html>
