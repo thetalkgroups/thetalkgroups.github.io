@@ -42,7 +42,6 @@
         document.removeEventListener("click", shadowClose);
     };
 
-    const headerImageHWRatio = 304 / 1000;
     const smallHeaderHeight = 72;
     const wrapperMargin = 16;
     const resizeNav = event => {

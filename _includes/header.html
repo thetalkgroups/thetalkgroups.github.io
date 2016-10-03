@@ -1,0 +1,35 @@
+{% assign hWRatio = include.height | times: 1.0 | divided_by: include.width %}
+<style>
+    .header {
+        background-image: url({{ include.image }});
+        color: {{ include.color }};
+        height: {{ hWRatio | times: 100 }}vw;
+    }
+</style>
+<script>const headerImageHWRatio = {{ hWRatio }};</script>
+
+<header class="header">
+    <div class="header__container">
+        <a href="{{ include.url }}" router-link class="header__h1">
+            <h1>{{ include.title }}</h1>
+        </a>
+
+        <section class="header__top-bar">
+            <a href="/sign-in/" router-link class="header__top-bar__sign-in-button" hidden>sign in</a>
+            <p class="header__top-bar__user-name" hidden></p>
+
+            <button class="header__top-bar__open-nav-button" hidden>
+                <img src="/assets/ic_menu_white_24px.svg" alt="open menu">
+            </button>
+
+            <section class="header__user card" hidden>
+                <img class="header__user__photo" alt="photo">
+                <section class="header__user__container">
+                    <p class="header__user__name"></p>
+                    <p class="header__user__email"></p>
+                    <button class="header__user__sign-out-button">sign out</button>
+                </section>
+            </section>
+        </section>
+    </div>
+</header>
