@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>The Talk Groups</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.4.0/firebase-auth.js"></script>
+    
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents-lite.min.js" async></script>-->
+
+    <link rel="stylesheet" href="/css/main.css" async>
+
+    <script src="/js/event-emitter.js" async></script>
+    <script src="/js/user-service.js" async></script>
+    <script src="/js/common.js" async defer></script>
+
+    {{ page.head }}
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__container">
+            <a href="/" router-link class="header__h1">
+                <h1>the talk groups</h1>
+            </a>
+
+            <section class="header__top-bar">
+                <a href="/sign-in/" router-link class="header__top-bar__sign-in-button" hidden>sign in</a>
+                <p class="header__top-bar__user-name" hidden></p>
+                
+                <button class="header__top-bar__open-nav-button" hidden>
+                    <img src="/assets/ic_menu_white_24px.svg" alt="open menu">
+                </button>
+            </section>
+
+            <section class="header__user card" hidden>
+                <img class="header__user__photo" alt="photo">
+                <section class="header__user__container">
+                    <p class="header__user__name"></p>
+                    <p class="header__user__email"></p>
+                    <button class="header__user__sign-out-button">sign out</button>
+                </section>
+            </section>
+        </div>
+    </header>
+
+    <div class="wrapper">
+        <nav class="navigation card">
+            <button class="navigation__close-nav-button" hidden>
+                <img src="/assets/ic_menu_black_24px.svg" alt="close menu">
+            </button>
+
+            
+        </nav>
+
+        {{ content }}
+    </div>
+
+    <section class="footer">
+        <section class="footer__facebook">
+            <h3>visit our facebook groups</h3>
+            
+            <div class="footer__facebook__links">
+                <a href="https://facebook.com">facebook group 1</a>
+                <a href="https://facebook.com">facebook group 2</a>
+                <a href="https://facebook.com">facebook group 3</a>
+                <a href="https://facebook.com">facebook group 4</a>
+                <a href="https://facebook.com">facebook group 5</a>
+                <a href="https://facebook.com">facebook group 6</a>
+            </div>
+        </section>
+    </section>
+</body>
+
+</html>

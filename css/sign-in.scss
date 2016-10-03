@@ -1,0 +1,64 @@
+---
+---
+
+.sign-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
+    padding: 16px;
+}
+
+.sign-in h1 {
+    align-self: flex-start;
+    margin-bottom: 32px;
+}
+
+.sign-in__button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    padding: 4px 8px;
+    width: 220px;
+    margin-bottom: 8px;
+    border-radius: 3px;
+    font-size: 0.75em;
+}
+.sign-in__button:last-child {
+    margin-bottom: 0;
+}
+
+.sign-in__button.google {
+    border: 1px solid rgba(0,0,0,0.05);
+    background: white;
+}
+
+.sign-in__button.google p {
+    color: black;
+}
+
+.sign-in__button.facebook p, .sign-in__button.twitter p {
+    color: white;
+}
+
+.sign-in__button.facebook {
+    background: #3b5998;
+}
+
+.sign-in__button.twitter {
+    background: #1da1f2;
+}
+
+.sign-in__button__icon {
+    width: 32px;
+    height: 32px;
+}
+
+.sign-in__button__text {
+    text-align: center;
+    text-transform: capitalize;
+    font-size: 1.2em;
+    width: 100%;
+}
