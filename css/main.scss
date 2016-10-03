@@ -109,13 +109,11 @@ button {
     justify-content: flex-end;
 
     top: 0;
-    left: 50%;
+    right: calc((100vw - 870px) / 2);
     height: 72px;
-    width: 100%;
     max-width: 870px;
     position: fixed;
     padding: 0 16px;
-    transform: translateX(-50%);
 }
 .header__top-bar__user-name {
     color: white;
