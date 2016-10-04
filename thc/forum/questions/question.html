@@ -1,0 +1,36 @@
+---
+layout: group
+baseUrl: /thc/
+header:
+    title: THC
+    image: /assets/thc.jpg
+    color: white
+    width: 1315
+    height: 419
+head: >
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js" async defer></script>
+    <script src="/js/questions.js" async defer></script>
+    <script src="/js/question.js" async defer></script>
+    <link rel="stylesheet" href="/css/question.css" async>
+---
+
+<section class="question__header">
+    <header>
+        <img class="question__header__photo" alt="photo">
+        <section>
+            <p class="question__header__name"></p>
+            <p class="question__header__date"></p>
+        </section>
+    </header>
+    <h2 class="question__header__title"></h2>
+    <p class="question__header__question"></p>
+</section>
+
+<section class="question__answers">
+</section>
+
+<section class="question__answer">
+    <button><img src="/assets/ic_camera_alt_black_24px.svg" alt="upload photo"></button>
+    <textarea placeholder="type your answer here..."></textarea>
+    <button>reply</button>
+</section>

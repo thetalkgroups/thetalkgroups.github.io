@@ -8,7 +8,11 @@
 <head>
     {% include head.html head=page.head %}
 
-    <link rel="stylesheet" href="/css/forum.css" async>
+    <link rel="stylesheet" href="/css/group.css" async>
+
+    <script>
+        const GROUP = "{{ page.group }}";
+    </script>
 </head>
 
 <body>
@@ -26,11 +30,12 @@
         <span>/</span>
         {% for piece in path %}
             {% assign url = url | append: "/" | append: piece | downcase %}
+            {% assign displayPiece = piece | replace_first: ".html", "" | replace: "-", " " %}
             {% if piece != last %}
-                <a href="{{ url }}">{{ piece }}</a>
+                <a href="{{ url }}">{{ displayPiece }}</a>
                 <span>/</span>
             {% else %}
-                <p>{{piece}}</p>
+                <p>{{displayPiece}}</p>
             {% endif %}
         {% endfor %}
     </section>
@@ -41,13 +46,13 @@
                 <img src="/assets/ic_menu_black_24px.svg" alt="close menu">
             </button> 
  
-            {% for link in site.forumLinks %}
-            <a href="{{ page.baseUrl }}{{ link | downcase | replace: ' ', '-' }}">{{ link }}</a> 
-            {% endfor %} 
+            <a href="{{ page.baseUrl }}/general-hr">General HR</a>
+            <a href="{{ page.baseUrl }}/test-kits">Test Kits</a>
+            <a href="{{ page.baseUrl }}/forum">Forum</a>
 
         </nav>
 
-        {{ content }}
+        <section class="card">{{ content }}</section>
     </div>
 
     {% include footer.html %}

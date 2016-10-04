@@ -1,27 +1,17 @@
 ---
 ---
 
-.breadcrumb {
+.forum {
     display: flex;
-    flex-direction: row;
-    align-items: center;  
-    align-self: flex-start;
+    flex-direction: column;
 
-    position: relative;
-    left: calc((100vw - 870px) / 2);
-    margin-bottom: 16px;
+    width: 100%;
 
-    p {
-        text-transform: capitalize;
-    }  
-
-    span {
-        margin: 0 4px;
+    a {
+        width: 100%;
+        margin-bottom: 8px;
     }
-}
-
-@media (max-width: 870px) {
-    .breadcrumb {
-        left: 16px;
+    a:last-child {
+        margin-bottom: 0;
     }
 }

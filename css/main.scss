@@ -194,6 +194,13 @@ button {
     width: 100%;
     max-width: 870px;
 }
+.wrapper > section.card {
+    display: flex;
+    flex-direction: column;
+    
+    width: 100%;
+    padding: 16px;
+}
 
 .footer {
     background: #424242;
@@ -215,6 +222,7 @@ button {
     a {
         font-size: 0.9em;
         margin-bottom: 4px;
+        color: #9E9E9E;
     }
     a:nth-child(6), a:nth-child(5) {
         margin-bottom: 0;

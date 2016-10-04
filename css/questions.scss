@@ -1,0 +1,37 @@
+---
+---
+
+h2 {
+    margin-bottom: 0;
+}
+
+.question {
+    display: flex;
+    flex-direction: column;
+
+    border-bottom: 1px solid #E0E0E0;
+    padding: 16px 0;
+
+    header {
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+
+        margin-bottom: 12px;
+    }
+    a {
+        font-size: 1.3em;
+    }
+}
+.question:last-child {
+    border-bottom: none;
+}
+
+.question__user-name {
+    margin-right: 8px;
+    text-transform: capitalize;
+}
+.question__date {
+    font-size: 0.75em;
+    color: #757575;
+}

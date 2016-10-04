@@ -1,6 +1,7 @@
 ---
-layout: forum
+layout: group
 baseUrl: /thc/
+group: thc
 header:
     title: THC
     image: /assets/thc.jpg
@@ -11,4 +12,5 @@ head: >
 
 ---
 
-<p>thc</p>
+Test Kits
+-
