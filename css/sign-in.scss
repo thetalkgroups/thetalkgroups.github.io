@@ -2,17 +2,12 @@
 ---
 
 .sign-in {
-    display: flex;
-    flex-direction: column;
     align-items: center;
 
-    width: 100%;
-    padding: 16px;
-}
-
-.sign-in h1 {
-    align-self: flex-start;
-    margin-bottom: 32px;
+    h1 {
+        align-self: flex-start;
+        margin-bottom: 32px;
+    }
 }
 
 .sign-in__button {
@@ -33,13 +28,14 @@
 .sign-in__button.google {
     border: 1px solid rgba(0,0,0,0.05);
     background: white;
+
+    p {
+        color: black;
+    }
 }
 
-.sign-in__button.google p {
-    color: black;
-}
-
-.sign-in__button.facebook p, .sign-in__button.twitter p {
+.sign-in__button.facebook p, 
+.sign-in__button.twitter p {
     color: white;
 }
 

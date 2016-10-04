@@ -1,4 +1,4 @@
-(() => {
+window.addEventListener("load", () => {
     "use strict";
 
     const navigation = document.querySelector(".navigation");
@@ -113,4 +113,4 @@
     closeNavButton.addEventListener("click", closeNav);
     signOutButton.addEventListener("click", signOut);
     userNameOnly.addEventListener("click", showUserCard);
-})();
+});
