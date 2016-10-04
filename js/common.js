@@ -3,6 +3,7 @@ window.addEventListener("load", () => {
 
     const navigation = document.querySelector(".navigation");
     const header = document.querySelector(".header");
+    const breadcrumb = document.querySelector(".breadcrumb");
     const wrapper = document.querySelector(".wrapper");
     const openNavButton = document.querySelector(".header__top-bar__open-nav-button");
     const closeNavButton = document.querySelector(".navigation__close-nav-button");
@@ -43,7 +44,8 @@ window.addEventListener("load", () => {
     };
 
     const smallHeaderHeight = 72;
-    const wrapperMargin = 16;
+    const topElement = breadcrumb || wrapper;
+    const topElementMargin = 16;
     const resizeNav = event => {
         const headerHeight = document.body.getBoundingClientRect().right * headerImageHWRatio;
         const headerHiddenHeight = headerHeight - smallHeaderHeight;
@@ -51,11 +53,11 @@ window.addEventListener("load", () => {
 
         if (scrollTop > headerHiddenHeight) {
             header.style.top = -headerHiddenHeight + "px";
-            wrapper.style.marginTop = headerHeight + wrapperMargin + "px";
+            topElement.style.marginTop = headerHeight + topElementMargin + "px";
             header.classList.add("small");
         }
         else {
-            wrapper.removeAttribute("style");
+            topElement.removeAttribute("style");
             header.classList.remove("small");
         }
     }
