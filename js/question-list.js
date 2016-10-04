@@ -6,6 +6,6 @@ window.addEventListener("load", function () {
         return item;
     };
     var questionListEl = document.querySelector(".question-list");
-    window.QUESTIONS.map(createQuestionListItem).forEach(function (item) { return questionListEl.appendChild(item); });
+    getQuestions().map(createQuestionListItem).forEach(function (item) { return questionListEl.appendChild(item); });
 });
 //# sourceMappingURL=question-list.js.map

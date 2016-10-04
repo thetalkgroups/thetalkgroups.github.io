@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
         "outDir": "js",
+        "pretty": true,
+        "module": "es6",
+        "sourceMap": true,
         "noImplicitAny": true,
         "removeComments": true,
         "noUnusedParameters": true,
-        "pretty": true,
-        "sourceMap": true
+        "forceConsistentCasingInFileNames": true
     },
     "include": [
         "ts/**/*",

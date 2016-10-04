@@ -17,5 +17,5 @@ window.addEventListener("load", () => {
 
     const questionListEl = document.querySelector(".question-list");
 
-    window.QUESTIONS.map(createQuestionListItem).forEach(item => questionListEl.appendChild(item))
+    getQuestions().map(createQuestionListItem).forEach(item => questionListEl.appendChild(item))
 });

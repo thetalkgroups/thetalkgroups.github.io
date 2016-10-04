@@ -1,5 +1,4 @@
 window.addEventListener("load", function () {
-    "use strict";
     var signInButtonGoogle = document.querySelector(".sign-in__button.google");
     var signInButtonFacebook = document.querySelector(".sign-in__button.facebook");
     var signInButtonTwitter = document.querySelector(".sign-in__button.twitter");

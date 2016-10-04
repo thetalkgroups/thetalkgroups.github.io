@@ -9,7 +9,12 @@
 
     a {
         border-bottom: 1px solid #E0E0E0;
-        padding: 16px 0;
+        padding: 24px 0;
+
+        h2 {
+            margin: 0;
+            color: #212121;
+        }
     }
     a:last-child {
         border: none;

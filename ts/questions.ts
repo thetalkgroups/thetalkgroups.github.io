@@ -1,5 +1,7 @@
+let questions: Question[] = []
+
 const loadQuestions = () => {
-    window.QUESTIONS = [
+    questions = [
         {
             id: "1",
             user: {
@@ -59,7 +61,7 @@ const loadQuestions = () => {
     ] as Question[];
 }
 const getQuestion = (id: string) => {
-    let question = window.QUESTIONS.find(q => q.id === id)
+    let question = questions.find(q => q.id === id)
 
     if (!question || question.answers) {
         // TODO fetch question
@@ -67,5 +69,6 @@ const getQuestion = (id: string) => {
 
     return question;
 }
+const getQuestions = () => questions;
 
 loadQuestions();

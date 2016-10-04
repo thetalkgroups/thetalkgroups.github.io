@@ -1,5 +1,6 @@
+var questions = [];
 var loadQuestions = function () {
-    window.QUESTIONS = [
+    questions = [
         {
             id: "1",
             user: {
@@ -59,10 +60,11 @@ var loadQuestions = function () {
     ];
 };
 var getQuestion = function (id) {
-    var question = window.QUESTIONS.find(function (q) { return q.id === id; });
+    var question = questions.find(function (q) { return q.id === id; });
     if (!question || question.answers) {
     }
     return question;
 };
+var getQuestions = function () { return questions; };
 loadQuestions();
 //# sourceMappingURL=questions.js.map

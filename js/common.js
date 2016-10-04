@@ -1,5 +1,4 @@
 window.addEventListener("load", function () {
-    "use strict";
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");
     var breadcrumb = document.querySelector(".breadcrumb");

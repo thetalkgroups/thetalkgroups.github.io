@@ -8,10 +8,10 @@ window.addEventListener("load", function () {
     var missingError = function () {
         console.error("question missing");
     };
-    var idMatch = location.search.match(/id=(\w+)/);
-    if (!idMatch)
+    var id = location.search.match(/id=(\w+)/);
+    if (!id)
         return missingError();
-    var question = getQuestion(idMatch[1]);
+    var question = getQuestion(id[1]);
     if (!question)
         return missingError();
     var headerPhoto = document.querySelector(".question__header__photo");

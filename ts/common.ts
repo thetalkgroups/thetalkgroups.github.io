@@ -1,8 +1,6 @@
 declare const headerImageHWRatio: number;
 
 window.addEventListener("load", () => {
-    "use strict";
-
     const navigation = document.querySelector(".navigation");
     const header = document.querySelector(".header") as HTMLElement;
     const breadcrumb = document.querySelector(".breadcrumb") as HTMLElement;

@@ -1,0 +1,25 @@
+{
+  "name": "thetalkgroups",
+  "version": "0.0.1",
+  "description": "thetalkgroups forum",
+  "main": "none",
+  "devDependencies": {
+    "typings": "^1.4.0",
+    "typescript": "^2.0.3"
+  },
+  "scripts": {
+      "postinstall": "typings install",
+      "build": "tsc",
+      "build:w": "tsc -w"
+  },
+  "author": "mathias hansen",
+  "license": "UNLICENSED",
+  "homepage": "https://github.com/thetalkgroups/thetalkgroups.github.io#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thetalkgroups/thetalkgroups.github.io.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thetalkgroups/thetalkgroups.github.io/issues"
+  }
+}
