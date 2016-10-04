@@ -1,21 +1,11 @@
-window.addEventListener("load", () => {
-    const createQuestionListItem = question => {
-        const item = document.createElement("article")
-
-        item.classList.add("question")
-
-        item.innerHTML = `
-            <header>
-                <p class="question__user-name">${question.user.name}</p>
-                <p class="question__date">${moment(question.date).fromNow()}</p>
-            </header>
-            <a href="question.html?id=${question.id}">${question.title}</a>
-        `
-
+window.addEventListener("load", function () {
+    var createQuestionListItem = function (question) {
+        var item = document.createElement("article");
+        item.classList.add("question");
+        item.innerHTML = "\n            <header>\n                <p class=\"question__user-name\">" + question.user.name + "</p>\n                <p class=\"question__date\">" + moment(question.date).fromNow() + "</p>\n            </header>\n            <a href=\"question.html?id=" + question.id + "\">" + question.title + "</a>\n        ";
         return item;
-    }
-
-    const questionListEl = document.querySelector(".question-list");
-
-    QUESTIONS.map(createQuestionListItem).forEach(item => questionListEl.appendChild(item))
+    };
+    var questionListEl = document.querySelector(".question-list");
+    window.QUESTIONS.map(createQuestionListItem).forEach(function (item) { return questionListEl.appendChild(item); });
 });
+//# sourceMappingURL=question-list.js.map

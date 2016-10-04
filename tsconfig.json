@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "outDir": "js",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "noUnusedParameters": true,
+        "pretty": true,
+        "sourceMap": true
+    },
+    "include": [
+        "ts/**/*",
+        "typings/index.d.ts"
+    ]
+}

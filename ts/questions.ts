@@ -1,4 +1,4 @@
-var loadQuestions = function () {
+const loadQuestions = () => {
     window.QUESTIONS = [
         {
             id: "1",
@@ -56,13 +56,16 @@ var loadQuestions = function () {
                 }
             ]
         }
-    ];
-};
-var getQuestion = function (id) {
-    var question = window.QUESTIONS.find(function (q) { return q.id === id; });
+    ] as Question[];
+}
+const getQuestion = (id: string) => {
+    let question = window.QUESTIONS.find(q => q.id === id)
+
     if (!question || question.answers) {
+        // TODO fetch question
     }
+
     return question;
-};
+}
+
 loadQuestions();
-//# sourceMappingURL=questions.js.map

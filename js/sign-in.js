@@ -1,14 +1,13 @@
-window.addEventListener("load", () => {
+window.addEventListener("load", function () {
     "use strict";
-
-    const signInButtonGoogle = document.querySelector(".sign-in__button.google");
-    const signInButtonFacebook = document.querySelector(".sign-in__button.facebook");
-    const signInButtonTwitter = document.querySelector(".sign-in__button.twitter");
-
-    const signIn = provider =>
-        userService.signIn(provider).then(() => location.href = "/");
-
-    signInButtonGoogle.addEventListener("click", () => signIn("google"));
-    signInButtonFacebook.addEventListener("click", () => signIn("facebook"));
-    signInButtonTwitter.addEventListener("click", () => signIn("twitter"));
+    var signInButtonGoogle = document.querySelector(".sign-in__button.google");
+    var signInButtonFacebook = document.querySelector(".sign-in__button.facebook");
+    var signInButtonTwitter = document.querySelector(".sign-in__button.twitter");
+    var signIn = function (provider) {
+        return window.userService.signIn(provider).then(function () { return location.href = "/"; });
+    };
+    signInButtonGoogle.addEventListener("click", function () { return signIn("google"); });
+    signInButtonFacebook.addEventListener("click", function () { return signIn("facebook"); });
+    signInButtonTwitter.addEventListener("click", function () { return signIn("twitter"); });
 });
+//# sourceMappingURL=sign-in.js.map
