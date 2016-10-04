@@ -8,10 +8,10 @@
     width: 100%;
 
     a {
-        width: 100%;
-        margin-bottom: 8px;
+        border-bottom: 1px solid #E0E0E0;
+        padding: 16px 0;
     }
     a:last-child {
-        margin-bottom: 0;
+        border: none;
     }
 }

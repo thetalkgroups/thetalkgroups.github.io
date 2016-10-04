@@ -13,8 +13,10 @@
     }
 }
 .question__header__photo, .question__answers__answer__photo {
-    width: 48px;
-    height: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    min-height: 48px;
+    max-height: 48px;
     margin-right: 16px;
     border-radius: 50%;
 }
@@ -67,6 +69,8 @@
     }
 
     button {
+        display: flex;
+
         padding: 0 14px;
     }
 }
