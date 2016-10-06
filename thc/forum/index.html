@@ -11,4 +11,10 @@ head: >
     <link rel="stylesheet" href="/css/forum.css" async>
 ---
 
-{% include forum-main.html baseUrl=page.baseUrl %}
+<section class="forum">
+    <a href="{{ page.baseUrl }}forum/read-first.html"><h2>Read first!</h2></a>
+    <a href="{{ page.baseUrl }}forum/harm-reduction.html"><h2>Harm Reduction</h2></a>
+    <a href="{{ page.baseUrl }}forum/trip-reports"><h2>Trip Reports</h2></a>
+    <a href="{{ page.baseUrl }}forum/tips-and-tricks"><h2>Tips And Tricks</h2></a>
+    <a href="{{ page.baseUrl }}forum/questions"><h2>Questions</h2></a>
+</section>
