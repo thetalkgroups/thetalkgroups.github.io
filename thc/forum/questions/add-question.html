@@ -8,10 +8,15 @@ header:
     width: 1315
     height: 419
 head: >
+    <script src="/js/add-question.js" async defer></script>
     <link rel="stylesheet" href="/css/add-question.css" async>
 ---
 
-<form class="add-question" action="http://localhost:4001/forum/thc/question" method="PUT">
+<section class="add-question__login-warning">
+    <p>you must be logged in to use this feature</p>
+</section>
+
+<form class="add-question" action="http://localhost:4001/forum/thc/question" method="PUT" hidden>
     <label for="title">title</label>
     <input name="title" type="text" required/>
 
