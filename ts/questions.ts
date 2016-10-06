@@ -20,9 +20,6 @@ const getQuestions = (): Promise<Question[]> => {
         .map(key => localStorage.getItem(key))
         .map(item => JSON.parse(item));
 
-        console.log(Object.keys(localStorage)
-        .filter(key => key));
-
     // TODO fetch new questions
 
     return Promise.resolve(questions);

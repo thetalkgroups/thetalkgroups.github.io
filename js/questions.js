@@ -13,8 +13,6 @@ var getQuestions = function () {
         .filter(function (key) { return key.startsWith(window.GROUP + "-question-"); })
         .map(function (key) { return localStorage.getItem(key); })
         .map(function (item) { return JSON.parse(item); });
-    console.log(Object.keys(localStorage)
-        .filter(function (key) { return key; }));
     return Promise.resolve(questions);
 };
 var addQuestion = function (question) {
