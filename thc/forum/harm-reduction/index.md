@@ -12,5 +12,3 @@ published: true
 
 ## Harm Reduction!
 
-[tg-logo.jpg]({{site.baseurl}}/thc/forum/harm-reduction/tg-logo.jpg)
-
