@@ -1,0 +1,22 @@
+---
+layout: group
+baseUrl: /thc/
+header:
+    title: THC
+    image: /assets/thc.jpg
+    color: white
+    width: 1315
+    height: 419
+head: >
+    <link rel="stylesheet" href="/css/add-question.css" async>
+---
+
+<form class="add-question" action="http://localhost:4001/forum/thc/question" method="PUT">
+    <label for="title">title</label>
+    <input name="title" type="text" required/>
+
+    <label for="question">question</label>
+    <textarea name="question" required></textarea>
+
+    <button type="submit">add</button>
+</form>

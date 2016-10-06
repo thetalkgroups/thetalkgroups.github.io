@@ -1,6 +1,10 @@
 ---
 ---
 
+.wrapper > section.card {
+    padding: 0 16px !important;
+}
+
 .forum {
     display: flex;
     flex-direction: column;

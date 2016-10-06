@@ -1,0 +1,33 @@
+---
+---
+
+.add-question {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.add-question label {
+    font-size: 1.2em;
+    margin-bottom: 8px;
+    text-transform: capitalize;
+}
+
+.add-question input, .add-question textarea {
+    margin-bottom: 8px;
+    padding: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.add-question textarea {
+    flex: 1;
+
+    min-height: 120px;
+    resize: none;
+}   
+
+.add-question button {
+    align-self: flex-end;
+
+    padding: 8px;
+}
