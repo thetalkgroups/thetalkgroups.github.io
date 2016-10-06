@@ -3,14 +3,14 @@
 
 .breadcrumb {
     display: flex;
-    flex-direction: row;
-    align-items: center;  
+    flex-direction: row; 
+    align-items: center;
     align-self: flex-start;
 
     position: relative;
-    left: calc((100vw - 870px) / 2);
     margin-bottom: 16px;
-
+    left: calc((100vw - 870px) / 2);
+    
     p {
         text-transform: capitalize;
     }  
@@ -20,8 +20,12 @@
     }
 }
 
+img {
+    max-width: 100%;
+}
+
 @media (max-width: 870px) {
-    .breadcrumb {
-        left: 16px;
+    .minor-header {
+        padding: 0 16px;
     }
 }

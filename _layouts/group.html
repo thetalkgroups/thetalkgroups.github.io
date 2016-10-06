@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/css/group.css" async>
 
     <script>
-        const GROUP = "{{ page.group }}";
+        window.GROUP = "{{ page.baseUrl }}";
     </script>
 </head>
 
@@ -46,9 +46,9 @@
                 <img src="/assets/ic_menu_black_24px.svg" alt="close menu">
             </button> 
  
+            <a href="{{ page.baseUrl }}/forum">Forum</a>
             <a href="{{ page.baseUrl }}/general-hr">General HR</a>
             <a href="{{ page.baseUrl }}/test-kits">Test Kits</a>
-            <a href="{{ page.baseUrl }}/forum">Forum</a>
 
         </nav>
 

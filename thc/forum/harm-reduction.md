@@ -10,5 +10,4 @@ header:
 head: >
 ---
 
-Tips and Tricks
--
+## Harm Reduction!

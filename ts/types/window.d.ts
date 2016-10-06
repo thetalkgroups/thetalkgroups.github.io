@@ -1,4 +1,4 @@
 interface Window {
-    QUESTIONS: Question[]
     userService: UserService
+    GROUP: string
 }

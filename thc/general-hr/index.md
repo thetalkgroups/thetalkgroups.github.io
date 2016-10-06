@@ -11,5 +11,4 @@ head: >
 
 ---
 
-General HR
--
+## General HR
