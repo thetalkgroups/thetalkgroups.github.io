@@ -14,7 +14,13 @@ prose:
         "css",
         "js",
         "ts",
-        "sign-in.html"
+        "sign-in.html",
+        "package.json",
+        "tsconfig.json",
+        "Gemfile",
+        "Gemfile.lock",
+        ".gitignore",
+        "_config.yml"
     ]
 
 # Build settings
