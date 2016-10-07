@@ -15,8 +15,8 @@ var getQuestions = function () {
         .map(function (item) { return JSON.parse(item); });
     return Promise.resolve(questions);
 };
-var addQuestion = function (question) {
-    delete question;
+var addQuestion = function (data) {
+    delete data;
     return Promise.resolve();
 };
 //# sourceMappingURL=questions.js.map

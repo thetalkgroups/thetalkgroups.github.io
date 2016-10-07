@@ -24,10 +24,10 @@ const getQuestions = (): Promise<Question[]> => {
 
     return Promise.resolve(questions);
 };
-const addQuestion = (question: { title: string, question: string, user: User }): Promise<void> => {
+const addQuestion = (data: { title: string, question: string, user: User }): Promise<void> => {
     // TODO add question
 
-    delete question;
+    delete data;
 
     return Promise.resolve()
 }
