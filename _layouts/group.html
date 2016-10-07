@@ -1,3 +1,4 @@
+{% assign data = site.data[page.group] %}
 {% assign path = page.url | replace_first: "/", "" | split: "/" %}
 {% assign last = path | last %} 
 {% assign url = "" %}
@@ -11,18 +12,18 @@
     <link rel="stylesheet" href="/css/group.css" async>
 
     <script>
-        window.GROUP = "{{ page.baseUrl }}";
+        window.GROUP = "{{ data.baseUrl }}";
     </script>
 </head>
 
 <body>
     {% include header.html 
-        title=page.header.title
-        image=page.header.image 
-        color=page.header.color 
-        width=page.header.width 
-        height=page.header.height 
-        url=page.baseUrl
+        title=data.header.title
+        image=data.header.image 
+        color=data.header.color 
+        width=data.header.width 
+        height=data.header.height 
+        url=data.baseUrl
     %}
 
     <section class="breadcrumb">
@@ -46,9 +47,9 @@
                 <img src="/assets/static/ic_menu_black_24px.svg" alt="close menu">
             </button> 
  
-            <a href="{{ page.baseUrl }}/forum/">Forum</a>
-            <a href="{{ page.baseUrl }}/general-hr.html">General HR</a>
-            <a href="{{ page.baseUrl }}/test-kits.html">Test Kits</a>
+            <a href="{{ data.baseUrl }}forum/">Forum</a>
+            <a href="{{ data.baseUrl }}general-hr.html">General HR</a>
+            <a href="{{ data.baseUrl }}test-kits.html">Test Kits</a>
 
         </nav>
 
