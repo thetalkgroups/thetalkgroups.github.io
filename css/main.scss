@@ -76,7 +76,7 @@ button {
     will-change: auto;
     background-size: cover;
     background-repeat: no-repeat;
-    background-image: url(/assets/tg-logo.jpg);
+    will-change: auto;
 
     h1 {
         margin: 0;
@@ -246,6 +246,7 @@ button {
         width: 240px;
         transform: translateX(103%);
         transition: transform .3s;
+        will-change: auto;
     }
     .navigation:after {
         content: "";
