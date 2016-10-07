@@ -17,6 +17,7 @@ prose:
         "sign-in.html",
         "package.json",
         "tsconfig.json",
+        "typings.json",
         "Gemfile",
         "Gemfile.lock",
         ".gitignore",
