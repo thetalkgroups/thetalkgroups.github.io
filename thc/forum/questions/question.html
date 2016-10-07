@@ -30,11 +30,12 @@ head: >
 </section>
 
 <section class="question__login-warning">
-    <p><a href="/sign-in">login</a> to reply</p>
+    <p><a href="/sign-in.html">login</a> to reply</p>
 </section>
 
-<section class="question__reply" hidden>
-    <button><img src="/assets/ic_camera_alt_black_24px.svg" alt="upload photo"></button>
-    <textarea placeholder="type your answer here..."></textarea>
-    <button>reply</button>
-</section>
+<form class="question__reply" hidden>
+    <label for="image"><img src="/assets/ic_camera_alt_black_24px.svg" alt="upload photo"></label>
+    <input id="image" name="image" type="file" accept="image/*" hidden>
+    <textarea name="answer" placeholder="type your answer here..." required></textarea>
+    <button type="submit">reply</button>
+</form>
