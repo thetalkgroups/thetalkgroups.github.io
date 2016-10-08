@@ -1,7 +1,7 @@
 ---
 ---
 
-.questions-header {
+.list-header {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -10,16 +10,14 @@
     h2 {
         margin-bottom: 0;
     }
-
-    
 }
-.questions-header__ask-a-question {
+.list-header__add-item {
     text-transform: uppercase;
     color: #212121;
     padding: 8px;
 }
 
-.question {
+.list-item {
     display: flex;
     flex-direction: column;
 
@@ -37,15 +35,15 @@
         font-size: 1.3em;
     }
 }
-.question:last-child {
+.list-item:last-child {
     border-bottom: none;
 }
 
-.question__user-name {
+.list-item__user-name {
     margin-right: 8px;
     text-transform: capitalize;
 }
-.question__date {
+.list-item__date {
     font-size: 0.75em;
     color: #757575;
 }
