@@ -3,7 +3,6 @@ layout: main
 head: >
     <link rel="stylesheet" href="/css/home.css" async/> 
 ---
-
 {::options parse_block_html="true" /}
 
 <section class="home">
