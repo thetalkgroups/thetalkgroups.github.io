@@ -10,7 +10,7 @@ window.addEventListener("load", function () {
         loginWarning.hidden = true;
         var onAddQuestion = function () {
             addQuestion({ title: titleInput.value, question: questionTextarea.value, user: user })
-                .then(function () { return location.href = window.GROUP + "forum/questions"; });
+                .then(function () { return location.href = window.GROUP_URL + "/forum/questions"; });
         };
         form.addEventListener("submit", onAddQuestion);
     });

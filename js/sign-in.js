@@ -3,7 +3,7 @@ window.addEventListener("load", function () {
     var signInButtonFacebook = document.querySelector(".sign-in__button.facebook");
     var signInButtonTwitter = document.querySelector(".sign-in__button.twitter");
     var signIn = function (provider) {
-        return window.userService.signIn(provider).then(function () { return location.href = "/"; });
+        return window.userService.signIn(provider).then(function () { return history.back(); });
     };
     signInButtonGoogle.addEventListener("click", function () { return signIn("google"); });
     signInButtonFacebook.addEventListener("click", function () { return signIn("facebook"); });
