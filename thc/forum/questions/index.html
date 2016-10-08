@@ -3,15 +3,20 @@ layout: group
 group: thc
 head: >
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js" async defer></script>
-    <script src="/js/questions.js" async defer></script>
-    <script src="/js/question-list.js" async defer></script>
-    <link rel="stylesheet" href="/css/questions.css" async>
+    <script src="/js/api.js"></script>
+    <script>
+        // TODO pagination
+        const api = new Api(`/group${window.GROUP_URL}/questions`);
+    </script>
+    <script src="/js/list.js" async defer></script>
+    <link rel="stylesheet" href="/css/list.css" async>
 ---
 
-<header class="questions-header">
+<header class="list-header">
     <h2>Questions</h2>
-    <a class="questions-header__ask-a-question" href="add-question.html" hidden>ask a question</a>
+    <a class="list-header__add-item" href="add-question.html" hidden>ask a question</a>
 </header>
 
-<section class="question-list">
+<section class="list">
 </section>
+

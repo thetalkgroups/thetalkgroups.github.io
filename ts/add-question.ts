@@ -12,7 +12,7 @@ window.addEventListener("load", () => {
 
         const onAddQuestion = () => {
             addQuestion({ title: titleInput.value, question: questionTextarea.value, user })
-                .then(() => location.href = `${window.GROUP}forum/questions`);
+                .then(() => location.href = `${window.GROUP_URL}/forum/questions`);
         };
 
         form.addEventListener("submit", onAddQuestion);

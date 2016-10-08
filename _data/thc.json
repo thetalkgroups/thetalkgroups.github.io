@@ -1,5 +1,5 @@
 {
-    "baseUrl": "/thc/",
+    "baseUrl": "/thc",
     "header": {
         "title": "THC",
         "image": "/assets/content/thc.jpg",

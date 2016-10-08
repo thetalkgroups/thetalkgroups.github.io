@@ -7,13 +7,13 @@
 <html>
 
 <head>
-    {% include head.html head=page.head %}
-
     <link rel="stylesheet" href="/css/group.css" async>
 
     <script>
-        window.GROUP = "{{ data.baseUrl }}";
+        window.GROUP_URL = "{{ data.baseUrl }}";
     </script>
+
+    {% include head.html head=page.head %}
 </head>
 
 <body>
@@ -47,9 +47,9 @@
                 <img src="/assets/static/ic_menu_black_24px.svg" alt="close menu">
             </button> 
  
-            <a href="{{ data.baseUrl }}forum/">Forum</a>
-            <a href="{{ data.baseUrl }}general-hr.html">General HR</a>
-            <a href="{{ data.baseUrl }}test-kits.html">Test Kits</a>
+            <a href="{{ data.baseUrl }}/forum/">Forum</a>
+            <a href="{{ data.baseUrl }}/general-hr.html">General HR</a>
+            <a href="{{ data.baseUrl }}/test-kits.html">Test Kits</a>
 
         </nav>
 

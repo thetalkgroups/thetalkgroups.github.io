@@ -1,4 +1,4 @@
 interface Window {
     userService: UserService
-    GROUP: string
+    GROUP_URL: string
 }
