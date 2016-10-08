@@ -1,8 +1,8 @@
-var createQuestionListItem = function (question) {
-    var item = document.createElement("article");
-    item.classList.add("question");
-    item.innerHTML = "\n        <header>\n            <p class=\"question__user-name\">" + question.user.name + "</p>\n            <p class=\"question__date\">" + moment(question.date).fromNow() + "</p>\n        </header>\n        <a href=\"question.html?id=" + question.id + "\">" + question.title + "</a>\n    ";
-    return item;
+var createListItem = function (item, className) {
+    var itemEl = document.createElement("article");
+    itemEl.classList.add(className);
+    itemEl.innerHTML = "\n        <header>\n            <p class=\"" + className + "__user-name\">" + item.user.name + "</p>\n            <p class=\"" + className + "__date\">" + moment(item.date).fromNow() + "</p>\n        </header>\n        <a href=\"" + className + ".html?id=" + item._id + "\">" + item.title + "</a>\n    ";
+    return itemEl;
 };
 window.addEventListener("load", function () {
     var questionListEl = document.querySelector(".question-list");
@@ -12,8 +12,8 @@ window.addEventListener("load", function () {
             return;
         askAQuestion.hidden = false;
     });
-    getQuestions().then(function (questions) {
-        return questions.map(createQuestionListItem)
+    getQuestions(1).then(function (questions) {
+        return questions.map(function (question) { return createListItem(question, "question"); })
             .forEach(function (item) { return questionListEl.appendChild(item); });
     });
 });

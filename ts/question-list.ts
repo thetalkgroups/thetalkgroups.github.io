@@ -1,17 +1,17 @@
-const createQuestionListItem = (question: Question) => {
-    const item = document.createElement("article")
+const createListItem = (item: { user: User, date: number, _id: string, title: string }, className: string) => {
+    const itemEl = document.createElement("article")
 
-    item.classList.add("question")
+    itemEl.classList.add(className);
 
-    item.innerHTML = `
+    itemEl.innerHTML = `
         <header>
-            <p class="question__user-name">${question.user.name}</p>
-            <p class="question__date">${moment(question.date).fromNow()}</p>
+            <p class="${className}__user-name">${item.user.name}</p>
+            <p class="${className}__date">${moment(item.date).fromNow()}</p>
         </header>
-        <a href="question.html?id=${question.id}">${question.title}</a>
+        <a href="${className}.html?id=${item._id}">${item.title}</a>
     `
 
-    return item;
+    return itemEl;
 }
 
 window.addEventListener("load", () => {
@@ -24,7 +24,8 @@ window.addEventListener("load", () => {
         askAQuestion.hidden = false;
     })
 
-    getQuestions().then(questions => 
-        questions.map(createQuestionListItem)
+    // TODO pagination
+    getQuestions(1).then(questions => 
+        questions.map(question => createListItem(question, "question"))
             .forEach(item => questionListEl.appendChild(item)));
 });

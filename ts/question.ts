@@ -1,20 +1,20 @@
-const createAnswer = (answer: Answer) => {
-    const item = document.createElement("article");
+const createUserListItem = (item: { user: User, title: string, date: number }, className: string) => {
+    const itemEl = document.createElement("article");
 
-    item.classList.add("question__answers__answer");
+    itemEl.classList.add(className);
 
-    item.innerHTML = `
-        <img class="question__answers__answer__photo" src="${answer.user.photo}"/>
-        <section class="question__answers__answer__text">
+    itemEl.innerHTML = `
+        <img class="${className}__photo" src="${item.user.photo}"/>
+        <section class="${className}__text">
             <section>
-                <p class="question__answers__answer__name">${answer.user.name}</p>
-                <p class="question__answers__answer__date">${moment(answer.date).fromNow()}</p>
+                <p class="${className}__name">${item.user.name}</p>
+                <p class="${className}__date">${moment(item.date).fromNow()}</p>
             </section>
-            <p class="question__answers__answer__answer">${answer.answer}</p>
+            <p class="${className}__content">${item.title}</p>
         </section>
     `;
 
-    return item;
+    return itemEl;
 }
 const missingError = () => {
     console.error("question missing");
@@ -43,8 +43,6 @@ window.addEventListener("load", () => {
     
     getQuestion(idMatch[1])
         .then(question => {
-            
-
             headerPhoto.src = question.user.photo;
             headerName.innerText = question.user.name;
             headerDate.innerText = moment(question.date).fromNow();
@@ -52,7 +50,14 @@ window.addEventListener("load", () => {
             headerQuestion.innerText = question.question;
             breadcrumbLocation.innerText = question.title;
 
-            question.answers.map(createAnswer).forEach(answer => answers.appendChild(answer));
+            // TODO pagination
+            return getReplys(question._id, 1).then(replys => replys
+                .map(({ user, date, answer }) => 
+                    createUserListItem({ user, date, title: answer}, "question__answers__answer"))
+                .forEach(answer => answers.appendChild(answer)));
         })
-        .catch(missingError);
+        .catch(error => {
+            console.error(error);
+            missingError();
+        });
 });
