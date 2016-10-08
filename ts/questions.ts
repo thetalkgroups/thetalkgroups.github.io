@@ -1,33 +1,116 @@
-const qs = [
-    {"id":"1","user":{"name":"mathias hansen","photo":"https://lh4.googleusercontent.com/-LE9x7nwRVic/AAAAAAAAAAI/AAAAAAAAFQ0/Zi6P-VtAeKU/s96-c/photo.jpg"},"date":1475594718761,"title":"question 1?","question":"Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.","answers":[{"user":{"name":"mathias hansen","photo":"https://lh4.googleusercontent.com/-LE9x7nwRVic/AAAAAAAAAAI/AAAAAAAAFQ0/Zi6P-VtAeKU/s96-c/photo.jpg"},"answer":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ","date":1475594727900},{"user":{"name":"mathias hansen","photo":"https://lh4.googleusercontent.com/-LE9x7nwRVic/AAAAAAAAAAI/AAAAAAAAFQ0/Zi6P-VtAeKU/s96-c/photo.jpg"},"answer":"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.","date":1475606300585}]},
-    {"id":"2","user":{"name":"mathias hansen","photo":"https://lh4.googleusercontent.com/-LE9x7nwRVic/AAAAAAAAAAI/AAAAAAAAFQ0/Zi6P-VtAeKU/s96-c/photo.jpg"},"date":1475594718761,"title":"question 2?","question":"At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio.","answers":[{"user":{"name":"mathias hansen","photo":"https://lh4.googleusercontent.com/-LE9x7nwRVic/AAAAAAAAAAI/AAAAAAAAFQ0/Zi6P-VtAeKU/s96-c/photo.jpg"},"answer":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ","date":1475594727900},{"user":{"name":"mathias hansen","photo":"https://lh4.googleusercontent.com/-LE9x7nwRVic/AAAAAAAAAAI/AAAAAAAAFQ0/Zi6P-VtAeKU/s96-c/photo.jpg"},"answer":"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.","date":1475606300585}]}
-]
+const getQuestionFromCache = (id: string): Question => 
+    JSON.parse(localStorage.getItem(`${window.GROUP}-question-${id}`));
+const setQuestionInCache = (question: Question) =>
+    localStorage.setItem(`${window.GROUP}-question-${question._id}`, JSON.stringify(question));
+const getReplyFromCache = (id: string) =>
+    JSON.parse(localStorage.getItem(`${window.GROUP}-question-reply-${id}`));
+const setReplyInCache = (reply: Reply) =>
+    localStorage.setItem(`${window.GROUP}-question-reply-${reply._id}`, JSON.stringify(reply));
 
-const getQuestion = (id: string): Promise<Question> => {
-    let question = qs.find(q => q.id === id) || JSON.parse(localStorage.getItem(`${window.GROUP}-question-${id}`));
+const fetchQuestion = (id: string): Promise<Question> => 
+    fetch(`http://localhost:4001/group${window.GROUP}questions/${id}`)
+        .then(res => res.json());
+const listQuestions = (page: number): Promise<string[]> =>
+    fetch(`http://localhost:4001/group${window.GROUP}questions/list/${page}`)
+        .then(res => res.json());
+const fetchQuestions = (ids: string[]): Promise<Question[]> =>
+    fetch(`http://localhost:4001/group${window.GROUP}questions`, {
+        method: "POST",
+        body: JSON.stringify(ids),
+        headers: { "Content-Type": "application/json" }
+    }).then(res => res.json());
 
-    // TODO fetch new answers
+const fetchReplys = (questionId: string, ids: string[]): Promise<Reply[]> => 
+    fetch(`http://localhost:4001/group${window.GROUP}questions/${questionId}/replys`, {
+        method: "POST",
+        body: JSON.stringify(ids),
+        headers: { "Content-Type": "application/json" }
+    })
+        .then(res => res.json());
+const listReplys = (questionId: string, page: number): Promise<string[]> => 
+    fetch(`http://localhost:4001/group${window.GROUP}questions/${questionId}/replys/list/${page}`)
+        .then(res => res.json());
 
-    if (!question) {
-        // TODO fetch question from server
-    }
+const getQuestion = (id: string): Promise<Question> =>
+    Promise.resolve(getQuestionFromCache(id))
+        .then(question => {
+            if (!question || !question.question) 
+                return fetchQuestion(id).then(question => {
+                    setQuestionInCache(question);
 
-    return Promise.resolve(question);
-}
-const getQuestions = (): Promise<Question[]> => {
-    const questions = qs || Object.keys(localStorage)
-        .filter(key => key.startsWith(`${window.GROUP}-question-`))
-        .map(key => localStorage.getItem(key))
-        .map(item => JSON.parse(item));
+                    return question;
+                });
 
-    // TODO fetch new questions
+            return question;
+        })
+const getQuestions = (page: number): Promise<Question[]> => {
+    return listQuestions(page)
+        .then(ids => ids.map(id => getQuestionFromCache(id) || id))
+        .then(questions => {
+            const newQuestionIds = questions
+                .map((id, i) => {
+                    if (typeof id === "string") {
+                        delete questions[i];
 
-    return Promise.resolve(questions);
+                        return id
+                    }
+                })
+                .filter(Boolean) as string[];
+
+            if (newQuestionIds.length === 0) return questions;
+
+            return fetchQuestions(newQuestionIds)
+                .then(newQuestions => {
+                    newQuestions.forEach(setQuestionInCache);
+
+                    return questions.concat(newQuestions);
+                })
+        });
 };
 const addQuestion = (data: { title: string, question: string, user: User }): Promise<void> => {
-    // TODO add question
-
     delete data;
 
-    return Promise.resolve()
+    return Promise.reject(new Error("not implemented"));
+};
+const deleteQuestion = (id: string): Promise<void> => {
+    delete id;
+
+    return Promise.reject(new Error("not implemented"));
+};
+
+const getReplys = (questionId: string, page: number): Promise<Reply[]> =>
+    listReplys(questionId, page)
+        .then(ids => ids.map(id => getReplyFromCache(id) || id))
+        .then(replys => {
+            const newReplyIds = replys
+                .map((id, i) => {
+                    if (typeof id === "string") {
+                        delete replys[i];
+
+                        return id
+                    }
+                })
+                .filter(Boolean) as string[];
+
+            if (newReplyIds.length === 0) return replys;
+
+            return fetchReplys(questionId, newReplyIds)
+                .then(newReplys => {
+                    newReplys.forEach(setReplyInCache)
+
+                    return replys.concat(newReplys);
+                })
+        })
+
+const addReply = (questionId: string, data: { answer: string, user: User }): Promise<void> => {
+    delete questionId;
+    delete data;
+
+    return Promise.reject(new Error("not implemented"));
+}
+
+const deleteReply = (replyId: string): Promise<void> => {
+    delete replyId;
+
+    return Promise.reject(new Error("not implemented"));
 }

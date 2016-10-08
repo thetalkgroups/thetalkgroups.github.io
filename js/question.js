@@ -1,8 +1,8 @@
-var createAnswer = function (answer) {
-    var item = document.createElement("article");
-    item.classList.add("question__answers__answer");
-    item.innerHTML = "\n        <img class=\"question__answers__answer__photo\" src=\"" + answer.user.photo + "\"/>\n        <section class=\"question__answers__answer__text\">\n            <section>\n                <p class=\"question__answers__answer__name\">" + answer.user.name + "</p>\n                <p class=\"question__answers__answer__date\">" + moment(answer.date).fromNow() + "</p>\n            </section>\n            <p class=\"question__answers__answer__answer\">" + answer.answer + "</p>\n        </section>\n    ";
-    return item;
+var createUserListItem = function (item, className) {
+    var itemEl = document.createElement("article");
+    itemEl.classList.add(className);
+    itemEl.innerHTML = "\n        <img class=\"" + className + "__photo\" src=\"" + item.user.photo + "\"/>\n        <section class=\"" + className + "__text\">\n            <section>\n                <p class=\"" + className + "__name\">" + item.user.name + "</p>\n                <p class=\"" + className + "__date\">" + moment(item.date).fromNow() + "</p>\n            </section>\n            <p class=\"" + className + "__content\">" + item.title + "</p>\n        </section>\n    ";
+    return itemEl;
 };
 var missingError = function () {
     console.error("question missing");
@@ -34,8 +34,16 @@ window.addEventListener("load", function () {
         headerTitle.innerText = question.title;
         headerQuestion.innerText = question.question;
         breadcrumbLocation.innerText = question.title;
-        question.answers.map(createAnswer).forEach(function (answer) { return answers.appendChild(answer); });
+        return getReplys(question._id, 1).then(function (replys) { return replys
+            .map(function (_a) {
+            var user = _a.user, date = _a.date, answer = _a.answer;
+            return createUserListItem({ user: user, date: date, title: answer }, "question__answers__answer");
+        })
+            .forEach(function (answer) { return answers.appendChild(answer); }); });
     })
-        .catch(missingError);
+        .catch(function (error) {
+        console.error(error);
+        missingError();
+    });
 });
 //# sourceMappingURL=question.js.map
