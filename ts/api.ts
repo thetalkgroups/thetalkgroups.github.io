@@ -1,5 +1,16 @@
 const HOST = "http://localhost:4001"
 
+function formToJson<a>(form: HTMLFormElement): a {
+    const formData = new FormData(form);
+    const json: { [key: string]: any} = {};
+
+    (formData as any)["forEach"]((data: any, key: string) => {
+        json[key] = data;
+    })
+
+    return json as a;
+}
+
 function setCache<a>(key: string, item: a) {
     localStorage.setItem(key, JSON.stringify(item));
 }

@@ -1,4 +1,12 @@
 var HOST = "http://localhost:4001";
+function formToJson(form) {
+    var formData = new FormData(form);
+    var json = {};
+    formData["forEach"](function (data, key) {
+        json[key] = data;
+    });
+    return json;
+}
 function setCache(key, item) {
     localStorage.setItem(key, JSON.stringify(item));
 }

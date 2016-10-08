@@ -1,17 +1,6 @@
 declare const id: string
 declare const api: Api
 
-function formToJson<a>(form: HTMLFormElement): a {
-    const formData = new FormData(form);
-    const json: { [key: string]: any} = {};
-
-    (formData as any)["forEach"]((data: any, key: string) => {
-        json[key] = data;
-    })
-
-    return json as a;
-}
-
 const createReplyElement = (item: Reply) => {
     const el = document.createElement("article");
     const photo = document.createElement("img");

@@ -2,6 +2,10 @@
 layout: group
 group: thc
 head: >
+    <script src="/js/api.js"></script>
+    <script>
+        const api = new Api(`/group${window.GROUP_URL}/questions`)
+    </script>
     <script src="/js/add-question.js" async defer></script>
     <link rel="stylesheet" href="/css/add-question.css" async>
 ---
@@ -14,8 +18,8 @@ head: >
     <label for="title">title</label>
     <input name="title" type="text" required/>
 
-    <label for="question">question</label>
-    <textarea name="question" required></textarea>
+    <label for="content">question</label>
+    <textarea name="content" required></textarea>
 
     <button type="submit">add</button>
 </form>

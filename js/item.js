@@ -1,11 +1,3 @@
-function formToJson(form) {
-    var formData = new FormData(form);
-    var json = {};
-    formData["forEach"](function (data, key) {
-        json[key] = data;
-    });
-    return json;
-}
 var createReplyElement = function (item) {
     var el = document.createElement("article");
     var photo = document.createElement("img");
