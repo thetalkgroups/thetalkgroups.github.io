@@ -3,33 +3,24 @@ layout: group
 group: thc
 head: >
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js" async defer></script>
-    <script src="/js/questions.js" async defer></script>
-    <script src="/js/question.js" async defer></script>
-    <link rel="stylesheet" href="/css/question.css" async>
+    <link rel="stylesheet" href="/css/item.css" async>
+    <script src="/js/api.js"></script>
+    <script>
+        // TODO pagination
+        const idMatch = location.search.match(/id=(\w+)/);
+        let api;
+        let id
+
+        if (!idMatch) {
+            console.error("id missing");
+        }
+        else {
+            id = idMatch[1];
+            api = new Api(`/group${window.GROUP_URL}/questions`, id, question => !question || !question.content)
+        }
+    </script>
+    <script src="/js/item.js" async></script>
 ---
 
-<section class="question__header">
-    <header>
-        <img class="question__header__photo" alt="photo">
-        <section>
-            <p class="question__header__name"></p>
-            <p class="question__header__date"></p>
-        </section>
-    </header>
-    <h2 class="question__header__title"></h2>
-    <p class="question__header__question"></p>
+<section class="item">
 </section>
-
-<section class="question__answers">
-</section>
-
-<section class="question__login-warning">
-    <p><a href="/sign-in.html">login</a> to reply</p>
-</section>
-
-<form class="question__reply" hidden>
-    <label for="image"><img src="/assets/static/ic_camera_alt_black_24px.svg" alt="upload photo"></label>
-    <input id="image" name="image" type="file" accept="image/*" hidden>
-    <textarea name="answer" placeholder="type your answer here..." required></textarea>
-    <button type="submit">reply</button>
-</form>

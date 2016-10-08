@@ -1,18 +1,20 @@
 ---
 ---
 
-.question__header {
+.item__header {
     border-bottom: 1px solid #E0E0E0;
     padding-bottom: 16px;
-
-    header {
-        display: flex;
-        flex-direction: row;
-        margin-bottom: 16px;
-        align-items: center;
-    }
 }
-.question__header__photo, .question__answers__answer__photo {
+
+.item__header__top{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    margin-bottom: 16px;
+}
+
+.item__photo, .reply__photo {
     min-width: 48px;
     max-width: 48px;
     min-height: 48px;
@@ -20,24 +22,24 @@
     margin-right: 16px;
     border-radius: 50%;
 }
-.question__header__name, .question__answers__answer__name {
+.item__name, .reply__name {
     text-transform: capitalize;
     font-weight: bold;
     margin-bottom: 4px;
 }
-.question__header__date, .question__answers__answer__date {
+.item__date, .reply__date {
     font-size: 0.75em;
     color: #757575;
 }
 
-.question__answers__answer {
+.reply {
     display: flex;
     flex-direction: row;
     border-bottom: 1px solid #E0E0E0;
     margin-top: 16px;    
 }
 
-.question__answers__answer__text {
+.reply__text {
     display: flex;
     flex-direction: column;
     margin-bottom: 16px;
@@ -47,11 +49,11 @@
     }
 }
 
-.question__answers__answer:last-child {
+.reply:last-child {
     border-bottom: none;
 }
 
-.question__reply {
+.reply-form {
     border-top: 1px solid #E0E0E0;
     display: flex;
     flex-direction: row;
@@ -68,17 +70,17 @@
         line-height: 1.7;
     }
 
-    button {
+    button, label {
         display: flex;
 
         padding: 0 14px;
     }
 }
-.question__reply[hidden] {
+.reply-form[hidden] {
     display: none;
 }
 
-.question__login-warning {
+.login-warning {
     padding: 16px 16px 0 16px;
     border-top: 1px solid #E0E0E0;
 }
