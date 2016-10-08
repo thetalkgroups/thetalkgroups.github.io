@@ -4,7 +4,7 @@ window.addEventListener("load", () => {
     const signInButtonTwitter = document.querySelector(".sign-in__button.twitter");
 
     const signIn = (provider: string) =>
-        window.userService.signIn(provider).then(() => location.href = "/");
+        window.userService.signIn(provider).then(() => history.back());
 
     signInButtonGoogle.addEventListener("click", () => signIn("google"));
     signInButtonFacebook.addEventListener("click", () => signIn("facebook"));
