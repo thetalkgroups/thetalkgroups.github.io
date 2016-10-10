@@ -79,16 +79,45 @@ var Api = (function () {
             this.replys = new CachedList(prefix + "/" + itemId + "/replys", null);
         }
     }
-    Api.prototype.add = function (data, reply) {
-        if (reply === void 0) { reply = false; }
-        return fetch(HOST + this.prefix + (reply ? "/" + this.itemId + "/replys" : ""), {
-            method: "PUT",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "application/json" }
-        }).then(function (_) { });
+    Api.prototype.add = function (data, onProgress) {
+        var _this = this;
+        var image = data["image"];
+        var next = Promise.resolve();
+        if (onProgress && image) {
+            var fd_1 = new FormData();
+            var xhr_1 = new XMLHttpRequest();
+            fd_1.append("image", image);
+            next = new Promise(function (resolve, reject) {
+                xhr_1.onload = function () {
+                    data["image"] = xhr_1.responseText;
+                    console.log(data["image"]);
+                    resolve();
+                };
+                xhr_1.onerror = reject;
+                xhr_1.onprogress = function (_a) {
+                    var lengthComputable = _a.lengthComputable, total = _a.total, loaded = _a.loaded;
+                    if (!lengthComputable)
+                        return onProgress(-1);
+                    onProgress(loaded / total);
+                };
+                xhr_1.open("POST", HOST + "/files", true);
+                xhr_1.send(fd_1);
+            });
+        }
+        return next.then(function () {
+            return fetch(HOST + _this.prefix + (onProgress ? "/" + _this.itemId + "/replys" : ""), {
+                method: "PUT",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" }
+            });
+        })
+            .then(function (_) { });
     };
     Api.prototype.delete = function (id) {
         return fetch("" + HOST + this.prefix + "/" + id, { method: "DELETE" }).then(function (_) { });
+    };
+    Api.prototype.getImageUrl = function (image) {
+        return HOST + "/files/" + image;
     };
     return Api;
 }());

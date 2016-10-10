@@ -20,28 +20,20 @@ api.list.get(page)
     .catch(error => console.error(error));
 
 const createListItemElement = (item: Item) => {
-    const itemEl = document.createElement("article");
-    const itemHeader = document.createElement("header");
-    const itemName = document.createElement("p");
-    const itemDate = document.createElement("p");
-    const itemTitle = document.createElement("a");
+    const template = document.importNode((document.getElementById("list-item") as HTMLTemplateElement).content, true);
+    const el = document.createElement("article");
+    el.appendChild(template)
 
-    itemEl.className = "list-item";
+    const itemName = el.querySelector(".list-item__name") as HTMLElement;
+    const itemDate = el.querySelector(".list-item__date") as HTMLElement;
+    const itemTitle = el.querySelector(".list-item__title") as HTMLAnchorElement;
 
-    itemName.className = "list-item__user-name";
+    el.className = "list-item";
+
     itemName.innerText = item.user.name;
-
-    itemDate.className = "list-item__date";
     itemDate.innerText = moment(item.date).fromNow();
-
     itemTitle.innerText = item.title;
     itemTitle.href = `${itemSinglar}.html?id=${item._id}`;
 
-    itemHeader.appendChild(itemName);
-    itemHeader.appendChild(itemDate);
-
-    itemEl.appendChild(itemHeader);
-    itemEl.appendChild(itemTitle);
-
-    return itemEl;
+    return el;
 }

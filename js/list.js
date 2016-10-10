@@ -17,22 +17,17 @@ api.list.get(page)
 })
     .catch(function (error) { return console.error(error); });
 var createListItemElement = function (item) {
-    var itemEl = document.createElement("article");
-    var itemHeader = document.createElement("header");
-    var itemName = document.createElement("p");
-    var itemDate = document.createElement("p");
-    var itemTitle = document.createElement("a");
-    itemEl.className = "list-item";
-    itemName.className = "list-item__user-name";
+    var template = document.importNode(document.getElementById("list-item").content, true);
+    var el = document.createElement("article");
+    el.appendChild(template);
+    var itemName = el.querySelector(".list-item__name");
+    var itemDate = el.querySelector(".list-item__date");
+    var itemTitle = el.querySelector(".list-item__title");
+    el.className = "list-item";
     itemName.innerText = item.user.name;
-    itemDate.className = "list-item__date";
     itemDate.innerText = moment(item.date).fromNow();
     itemTitle.innerText = item.title;
     itemTitle.href = itemSinglar + ".html?id=" + item._id;
-    itemHeader.appendChild(itemName);
-    itemHeader.appendChild(itemDate);
-    itemEl.appendChild(itemHeader);
-    itemEl.appendChild(itemTitle);
-    return itemEl;
+    return el;
 };
 //# sourceMappingURL=list.js.map

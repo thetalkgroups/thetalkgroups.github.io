@@ -12,4 +12,5 @@ interface Reply {
     user: User
     date: number
     answer: string
+    image: string
 }

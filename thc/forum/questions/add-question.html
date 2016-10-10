@@ -5,21 +5,12 @@ head: >
     <script src="/js/api.js"></script>
     <script>
         const api = new Api(`/group${window.GROUP_URL}/questions`)
+        const fields = [
+            { name: "content", type: "textarea", required: true }
+        ]
     </script>
-    <script src="/js/add-question.js" async defer></script>
-    <link rel="stylesheet" href="/css/add-question.css" async>
+    <script src="/js/add-item.js" async defer></script>
+    <link rel="stylesheet" href="/css/add-item.css" async>
 ---
 
-<section class="add-question__login-warning">
-    <p>you must be logged in to use this feature</p>
-</section>
-
-<form class="add-question" method="PUT" hidden>
-    <label for="title">title</label>
-    <input name="title" type="text" required/>
-
-    <label for="content">question</label>
-    <textarea name="content" required></textarea>
-
-    <button type="submit">add</button>
-</form>
+{% include add-item.html %}

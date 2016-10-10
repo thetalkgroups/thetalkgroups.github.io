@@ -1,6 +1,18 @@
 window.addEventListener("load", function () {
-    var loginWarning = document.querySelector(".add-question__login-warning");
-    var form = document.querySelector(".add-question");
+    var loginWarning = document.querySelector(".login-warning");
+    var form = document.querySelector(".add-item");
+    var fieldsEl = form.querySelector(".fields");
+    fields.forEach(function (field) {
+        var label = document.createElement("label");
+        var input = document.createElement(field.type);
+        label.innerText = field.name;
+        label.setAttribute("for", field.name);
+        input.id = field.name;
+        input.name = field.name;
+        input.required = field.required;
+        fieldsEl.appendChild(label);
+        fieldsEl.appendChild(input);
+    });
     window.userService.user.subscribe(function (user) {
         if (!user)
             return;
@@ -17,4 +29,4 @@ window.addEventListener("load", function () {
         form.addEventListener("submit", onAddQuestion);
     });
 });
-//# sourceMappingURL=add-question.js.map
+//# sourceMappingURL=add-item.js.map

@@ -1,14 +1,14 @@
 const HOST = "http://localhost:4001"
 
-function formToJson<a>(form: HTMLFormElement): a {
+function formToJson(form: HTMLFormElement): { [key: string]: any} {
     const formData = new FormData(form);
-    const json: { [key: string]: any} = {};
+    const json: { [key: string]: any } = {};
 
     (formData as any)["forEach"]((data: any, key: string) => {
         json[key] = data;
     })
 
-    return json as a;
+    return json;
 }
 
 function setCache<a>(key: string, item: a) {
@@ -91,15 +91,50 @@ class Api {
         }
     }
 
-    public add<b>(data: b, reply: boolean = false): Promise<void> {
-        return fetch(HOST + this.prefix + (reply ? `/${this.itemId}/replys` : ""), {
-            method: "PUT",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "application/json" }
-        }).then(_ => {});
+    public add<b>(data: b, onProgress?: (percent: number) => void): Promise<void> {
+        const image = (data as any)["image"];
+        let next = Promise.resolve();
+
+        if (onProgress && image) {
+            const fd = new FormData();
+            const xhr = new XMLHttpRequest();
+
+            fd.append("image", image);
+
+            next = new Promise<void>((resolve, reject) => {
+                xhr.onload = () => {
+                    (data as any)["image"] = xhr.responseText;
+
+                    console.log((data as any)["image"])
+
+                    resolve();
+                };
+                xhr.onerror = reject;
+                xhr.onprogress = ({ lengthComputable, total, loaded }) => {
+                    if (!lengthComputable) return onProgress(-1);
+
+                    onProgress(loaded / total);
+                };
+
+                xhr.open("POST", HOST + "/files", true);
+                xhr.send(fd);
+            })
+        }
+
+        return next.then(() => 
+            fetch(HOST + this.prefix + (onProgress ? `/${this.itemId}/replys` : ""), {
+                method: "PUT",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" }
+            }))
+            .then(_ => {});
     }
 
     public delete(id: string): Promise<void> {
         return fetch(`${HOST}${this.prefix}/${id}`, { method: "DELETE" }).then(_ => {});
+    }
+
+    public getImageUrl(image: string): string {
+        return HOST + "/files/" + image;
     }
 }

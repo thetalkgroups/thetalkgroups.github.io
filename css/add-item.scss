@@ -1,40 +1,45 @@
 ---
 ---
 
-.add-question {
+.add-item {
     display: flex;
     flex-direction: column;
     flex: 1;
 }
-.add-question[hidden] {
+.add-item[hidden] {
     display: none !important;
 }
 
-.add-question label {
+.add-item label {
     font-size: 1.2em;
     margin-bottom: 8px;
     text-transform: capitalize;
 }
 
-.add-question input, .add-question textarea {
+.add-item input, .add-item textarea {
     margin-bottom: 8px;
     padding: 8px;
     border: 1px solid rgba(0,0,0,0.1);
 }
 
-.add-question textarea {
+.add-item textarea {
     flex: 1;
 
     min-height: 120px;
     resize: none;
 }   
 
-.add-question button {
+.add-item button {
     align-self: flex-end;
 
     padding: 8px;
 }
 
-.add-question__login-warning {
+.add-item .fields {
+    display: flex;
+    flex-direction: column;
+}
+
+.__login-warning {
 
 }

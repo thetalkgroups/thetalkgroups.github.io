@@ -1,0 +1,36 @@
+<template id="reply">
+    <img class="reply__photo" alt="photo">
+    <section class="reply__text">
+        <section>
+            <p class="reply__name"></p>
+            <p class="reply__date"></p>
+        </section>
+        <p class="reply__answer"></p>
+        <img class="reply__image" alt="image" hidden>
+    </section>
+</template>
+
+<section class="item__header">
+    <header class="item__header__top">
+        <img class="item__photo" alt="photo">
+        <section>
+            <p class="item__name"></p>
+            <p class="item__date"></p>
+        </section>
+    </header>
+    <h2 class="item__title"></h2>
+    <p class="item__content"></p>
+</section>    
+
+<section class="replys"></section>
+
+<section class="login-warning">
+    <p><a href="/sign-in.html">login</a> to reply</p>
+</section>
+
+<form class="reply-form" hidden>
+    <label for="image"><img src="/assets/static/ic_camera_alt_black_24px.svg" alt="upload photo"></label>
+    <input id="image" name="image" type="file" accept="image/*" hidden>
+    <textarea id="answer" name="answer" placeholder="type your answer here..." required></textarea>
+    <button type="submit">reply</button>
+</form>
