@@ -257,6 +257,7 @@ button {
     }
 
     .navigation + .header__user {
+        opacity: 0;
         right: -240px;
         transition: right .3s;
     }
