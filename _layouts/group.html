@@ -9,6 +9,14 @@
 <head>
     <link rel="stylesheet" href="/css/group.css" async>
 
+    <style>
+        @media (max-width: 550px) {
+            .header__user {
+                top: 155px;
+            }
+        }
+    </style>
+
     <script>
         window.GROUP_URL = "{{ data.baseUrl }}";
     </script>
@@ -52,8 +60,10 @@
             <a href="{{ data.baseUrl }}/forum/">Forum</a>
             <a href="{{ data.baseUrl }}/general-hr.html">General HR</a>
             <a href="{{ data.baseUrl }}/test-kits.html">Test Kits</a>
-
+            <a href="/sign-in.html" class="header__top-bar__sign-in-button" hidden>sign in</a>
         </nav>
+
+        {% include user-card.html %}
 
         <section class="card">{{ content }}</section>
     </div>

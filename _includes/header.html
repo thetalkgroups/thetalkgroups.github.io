@@ -5,6 +5,9 @@
         color: {{ include.color }};
         height: {{ hWRatio | times: 100 }}vw;
     }
+    .header__top-bar__sign-in-button {
+        color: {{ include.color }};
+    }
 </style>
 <script>
     const headerImageHWRatio = {{ hWRatio }};
@@ -26,12 +29,11 @@
 <header class="header">
     <img style="height: {{ hWRatio | times: 100 }}vw" class="header__img small" src="{{ include.dataUrl }}" alt="header image">
     <div class="header__container">
-        <a href="{{ include.url }}" router-link class="header__h1">
+        <a href="{{ include.url }}" class="header__h1">
             <h1>{{ include.title }}</h1>
         </a>
 
         <section class="header__top-bar">
-            <a href="/sign-in.html" router-link class="header__top-bar__sign-in-button" hidden>sign in</a>
             <p class="header__top-bar__user-name" hidden></p>
 
             <button class="header__top-bar__open-nav-button" hidden>
@@ -40,15 +42,6 @@
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
                 </svg>
             </button>
-
-            <section class="header__user card" hidden>
-                <img class="header__user__photo" alt="photo">
-                <section class="header__user__container">
-                    <p class="header__user__name"></p>
-                    <p class="header__user__email"></p>
-                    <button class="header__user__sign-out-button">sign out</button>
-                </section>
-            </section>
         </section>
     </div>
 </header>

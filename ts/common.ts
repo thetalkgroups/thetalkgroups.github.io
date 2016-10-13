@@ -66,10 +66,12 @@ window.addEventListener("load", () => {
         if (!user) {
             signInButton.hidden = false;
             userNameOnly.hidden = true;
+            userCard.classList.add("not-signed-in");
         }
         else {
             signInButton.hidden = true;
             userNameOnly.hidden = false;
+            userCard.classList.remove("not-signed-in");
 
             userNameOnly.innerText = user.name;
 

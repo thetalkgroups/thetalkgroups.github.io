@@ -146,19 +146,24 @@ button {
     fill: currentColor;
 }
 .header__top-bar__sign-in-button {
-    color: currentColor;
     font-size: 1em;
     font-weight: bold;
     background: transparent;
     text-transform: uppercase;
+    position: fixed;
+    top: 25px;
+    right: 128px;
+    width: inherit;
 }
 .header__user {
     display: flex;
     flex-direction: row;
 
-    position: absolute;
+    position: fixed;
     top: 72px;
+    flex-direction: row !important;
     right: 16px;
+    width: initial !important;
 }
 .header__user[hidden] {
     opacity: 0;
@@ -243,6 +248,42 @@ button {
     }
     a:nth-child(6), a:nth-child(5) {
         margin-bottom: 0;
+    }
+}
+
+@media (max-width: 550px) {
+    .header__top-bar__user-name {
+        display: none;
+    }
+
+    .navigation + .header__user {
+        right: -240px;
+        transition: right .3s;
+    }
+
+    .navigation.open + .header__user {
+        opacity: 1;
+        z-index: 3;
+        box-shadow: none;
+        width: 240px !important;
+        right: 0;
+        top: 95px;
+    }
+
+    .navigation.open + .header__user .header__user__photo {
+        width: 40px;
+        height: 40px;
+    }
+
+    .header__user.not-signed-in {
+        display: none !important;
+    }
+
+    .header__top-bar__sign-in-button {
+        color: #616161 !important;
+        text-transform: capitalize;
+        font-weight: normal;
+        position: static;
     }
 }
 
