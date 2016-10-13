@@ -1,9 +1,10 @@
 interface Item {
-    _id: string
+    _id?: string
     user: User
-    date: number
+    date?: number
     title: string
-    content: string
+    content: { [key: string]: any }
+    fields: string[]
 }
 
 interface Reply {
@@ -13,4 +14,5 @@ interface Reply {
     date: number
     answer: string
     image: string
+
 }

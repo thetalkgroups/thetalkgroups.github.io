@@ -28,13 +28,13 @@ const createReplyElement = (item: Reply) => {
 };
 
 window.addEventListener("load", () => {
-    const replysEl = document.querySelector(".replys") as HTMLElement;
+    const replysEl = document.querySelector(".replys");
     const itemPhoto = document.querySelector(".item__photo") as HTMLImageElement;
-    const itemName = document.querySelector(".item__name") as HTMLElement;
-    const itemDate = document.querySelector(".item__date") as HTMLElement;
-    const itemTitle = document.querySelector(".item__title") as HTMLElement;
-    const itemContent = document.querySelector(".item__content") as HTMLElement;
-    const loginWarning = document.querySelector(".login-warning") as HTMLElement;
+    const itemName = document.querySelector(".item__name");
+    const itemDate = document.querySelector(".item__date");
+    const itemTitle = document.querySelector(".item__title");
+    const itemContent = document.querySelector(".item__content");
+    const loginWarning = document.querySelector(".login-warning");
     const reply = document.querySelector(".reply-form") as HTMLFormElement;
 
     let page = 1;
@@ -45,30 +45,33 @@ window.addEventListener("load", () => {
     api.list.getOne(id)
         .then(item => {
             itemPhoto.src = item.user.photo;
-            itemName.innerText = item.user.name;
-            itemDate.innerText = moment(item.date).fromNow();
-            itemTitle.innerText = item.title;
-            itemContent.innerText = item.content;
+            itemName.innerHTML = item.user.name;
+            itemDate.innerHTML = moment(item.date).fromNow();
+            itemTitle.innerHTML = item.title;
+
+            Object.keys(item.content)
+                .forEach(k => itemContent.innerHTML += `<div class="${k}">${item.content[k]}</div>`);
         })
         .catch(error => console.error(error));
 
     api.replys.get(page)
         .then(replys => 
-            replys.map(createReplyElement).forEach(replyEl => replysEl.appendChild(replyEl)))
+            replys.map(createReplyElement)
+                .forEach(replyEl => replysEl.appendChild(replyEl)))
         .catch(error => console.error(error));
 
     window.userService.user.subscribe(user => {
         if (!user) {
-            loginWarning.hidden = false;
-            reply.hidden = true;
+            loginWarning.removeAttribute("hidden");
+            reply.setAttribute("hidden", "");
 
             return;
         }
 
         delete user.id;
 
-        loginWarning.hidden = true;
-        reply.hidden = false;
+        loginWarning.setAttribute("hidden", "");
+        reply.removeAttribute("hidden");
 
         const onProgress = (progress: number) => {
             console.log(progress);
