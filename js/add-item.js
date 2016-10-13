@@ -21,9 +21,14 @@ window.addEventListener("load", function () {
         var onAddQuestion = function (event) {
             event.preventDefault();
             var formData = formToJson(form);
-            var otherFormData = Object.keys(formData).filter(function (k) { return k === "title"; }).reduce(function (obj, k) { return obj[k] = formData[k]; }, {});
+            var otherFormData = Object.keys(formData).filter(function (k) { return k === "title"; })
+                .reduce(function (obj, k) {
+                obj[k] = escapeHtml(formData[k]);
+                return obj;
+            }, {});
             var data = {
-                title: formData["title"],
+                _id: undefined,
+                title: escapeHtml(formData["title"]),
                 user: { name: user.name, photo: user.photo },
                 content: otherFormData,
                 fields: fields.map(function (field) { return field.name; })

@@ -1,12 +1,17 @@
 var HOST = "http://localhost:4001";
-function formToJson(form) {
+var formToJson = function (form) {
     var formData = new FormData(form);
     var json = {};
     formData["forEach"](function (data, key) {
         json[key] = data;
     });
     return json;
-}
+};
+var escapeHtml = function (content) {
+    if (typeof content === "string")
+        return content.replace(/</g, "&lt;");
+    return content;
+};
 function setCache(key, item) {
     localStorage.setItem(key, JSON.stringify(item));
 }
