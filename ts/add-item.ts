@@ -31,9 +31,9 @@ window.addEventListener("load", () => {
 
             const formData = formToJson(form) as { [key: string]: any }
             const otherFormData = Object.keys(formData).filter(k => k === "title")
-                .reduce((obj, k) => obj[k] = formData[k], {} as { [key: string]: any})
+                .reduce((obj, k) => obj[k] = escapeHtml(formData[k]), {} as { [key: string]: any})
             const data: Item = { 
-                title: formData["title"] as string, 
+                title: escapeHtml(formData["title"] as string), 
                 user: { name: user.name, photo: user.photo },
                 content: otherFormData, 
                 fields: fields.map(field => field.name) 

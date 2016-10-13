@@ -1,6 +1,6 @@
 const HOST = "http://localhost:4001"
 
-function formToJson(form: HTMLFormElement): { [key: string]: any} {
+const formToJson = (form: HTMLFormElement): { [key: string]: any} => {
     const formData = new FormData(form);
     const json: { [key: string]: any } = {};
 
@@ -9,6 +9,13 @@ function formToJson(form: HTMLFormElement): { [key: string]: any} {
     })
 
     return json;
+}
+
+const escapeHtml = (content: any) => {
+    if (typeof content === "string")
+        return content.replace(/</g, "&lt;");
+
+    return content;
 }
 
 function setCache<a>(key: string, item: a) {
