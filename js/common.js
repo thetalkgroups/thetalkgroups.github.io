@@ -55,10 +55,12 @@ window.addEventListener("load", function () {
         if (!user) {
             signInButton.hidden = false;
             userNameOnly.hidden = true;
+            userCard.classList.add("not-signed-in");
         }
         else {
             signInButton.hidden = true;
             userNameOnly.hidden = false;
+            userCard.classList.remove("not-signed-in");
             userNameOnly.innerText = user.name;
             userName.innerText = user.name;
             userEmail.innerText = user.email;

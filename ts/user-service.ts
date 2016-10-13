@@ -17,6 +17,10 @@ class UserService {
     user = new EventEmitter<User>()
 
     constructor() {
+        if (!Object.keys(localStorage).find(k => k.startsWith("firebase"))) {
+            this.user.next(null);
+        }
+
         firebase.auth().onAuthStateChanged(({ displayName, photoURL, email, uid }: { displayName: string, photoURL: string, email: string, uid: string }) =>
             this.user.next({ id: uid, name: displayName, photo: photoURL, email }))
     }

@@ -7,7 +7,9 @@ var EventEmitter = (function () {
         var _this = this;
         var thisId = this.nextId;
         this.nextId += 1;
-        func(this.value);
+        if (this.value !== undefined) {
+            func(this.value);
+        }
         this.subscribers.push({ id: thisId, func: func });
         return function () {
             _this.subscribers = _this.subscribers.filter(function (_a) {

@@ -13,6 +13,9 @@ var UserService = (function () {
     function UserService() {
         var _this = this;
         this.user = new EventEmitter();
+        if (!Object.keys(localStorage).find(function (k) { return k.startsWith("firebase"); })) {
+            this.user.next(null);
+        }
         firebase.auth().onAuthStateChanged(function (_a) {
             var displayName = _a.displayName, photoURL = _a.photoURL, email = _a.email, uid = _a.uid;
             return _this.user.next({ id: uid, name: displayName, photo: photoURL, email: email });

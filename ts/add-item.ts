@@ -26,7 +26,7 @@ window.addEventListener("load", () => {
         form.hidden = false;
         loginWarning.hidden = true;
 
-        const onAddQuestion = (event: Event) => {
+        const onAddItem = (event: Event) => {
             event.preventDefault();
 
             const formData = formToJson(form) as { [key: string]: any }
@@ -38,19 +38,20 @@ window.addEventListener("load", () => {
 
             const data: Item = {
                 _id: undefined,
+                isYou: undefined,
                 title: escapeHtml(formData["title"] as string), 
-                user: { name: user.name, photo: user.photo },
+                user: { id: user.id, name: user.name, photo: user.photo },
                 content: otherFormData, 
                 fields: fields.map(field => field.name) 
             };
 
-            api.add(data)
-                .then(() => location.href = window.GROUP_URL + "/forum/questions")
+            api.items.add(data)
+                .then(() => location.href = location.href.replace(/[\w-]+\.html$/, ""))
                 .catch(error => console.error(error));
 
             return false;
         };
 
-        form.addEventListener("submit", onAddQuestion);
+        form.addEventListener("submit", onAddItem);
     });
 });

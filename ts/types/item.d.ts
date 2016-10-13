@@ -5,6 +5,8 @@ interface Item {
     title: string
     content: { [key: string]: any }
     fields: string[]
+    sticky?: boolean
+    isYou: boolean
 }
 
 interface Reply {
@@ -14,5 +16,5 @@ interface Reply {
     date: number
     answer: string
     image: string
-
+    isYou: boolean
 }

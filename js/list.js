@@ -2,9 +2,8 @@ var pageMatch = location.search.match(/page=(\d+)/);
 var page = 1;
 if (pageMatch)
     page = parseInt(pageMatch[1], 10) || 1;
-var itemSinglar = location.pathname.match(/(\w+)\/$/)[1].replace(/s$/, "");
 var listEl = document.querySelector(".list");
-api.list.get(page)
+api.items.get(page)
     .then(function (items) { return items.map(createListItemElement).forEach(function (itemEl) { return listEl.appendChild(itemEl); }); })
     .then(function (_) {
     var questionListEl = document.querySelector(".list");
@@ -23,7 +22,7 @@ var createListItemElement = function (item) {
     var itemName = el.querySelector(".list-item__name");
     var itemDate = el.querySelector(".list-item__date");
     var itemTitle = el.querySelector(".list-item__title");
-    el.className = "list-item";
+    el.className = "list-item " + (item.sticky ? "sticky" : "");
     itemName.innerText = item.user.name;
     itemDate.innerText = moment(item.date).fromNow();
     itemTitle.innerText = item.title;

@@ -18,7 +18,7 @@ window.addEventListener("load", function () {
             return;
         form.hidden = false;
         loginWarning.hidden = true;
-        var onAddQuestion = function (event) {
+        var onAddItem = function (event) {
             event.preventDefault();
             var formData = formToJson(form);
             var otherFormData = Object.keys(formData).filter(function (k) { return k === "title"; })
@@ -28,17 +28,18 @@ window.addEventListener("load", function () {
             }, {});
             var data = {
                 _id: undefined,
+                isYou: undefined,
                 title: escapeHtml(formData["title"]),
-                user: { name: user.name, photo: user.photo },
+                user: { id: user.id, name: user.name, photo: user.photo },
                 content: otherFormData,
                 fields: fields.map(function (field) { return field.name; })
             };
-            api.add(data)
-                .then(function () { return location.href = window.GROUP_URL + "/forum/questions"; })
+            api.items.add(data)
+                .then(function () { return location.href = location.href.replace(/[\w-]+\.html$/, ""); })
                 .catch(function (error) { return console.error(error); });
             return false;
         };
-        form.addEventListener("submit", onAddQuestion);
+        form.addEventListener("submit", onAddItem);
     });
 });
 //# sourceMappingURL=add-item.js.map

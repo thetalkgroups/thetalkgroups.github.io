@@ -8,7 +8,9 @@ class EventEmitter<T> {
 
         this.nextId += 1;
 
-        func(this.value);
+        if (this.value !== undefined) {
+            func(this.value);
+        }
 
         this.subscribers.push({ id: thisId, func });
 
