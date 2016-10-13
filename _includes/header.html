@@ -1,14 +1,30 @@
 {% assign hWRatio = include.height | times: 1.0 | divided_by: include.width %}
+
 <style>
     .header {
-        background-image: url({{ include.image }});
         color: {{ include.color }};
         height: {{ hWRatio | times: 100 }}vw;
     }
 </style>
-<script>const headerImageHWRatio = {{ hWRatio }};</script>
+<script>
+    const headerImageHWRatio = {{ hWRatio }};
+    
+    window.onload = function () {
+        const header = document.querySelector(".header");
+        const img = document.createElement("img");
+        const headerImg = document.querySelector(".header__img");
+
+        img.onload = () => {
+            header.insertBefore(img, headerImg);
+            headerImg.setAttribute("hidden", "");   
+        }
+        img.className = "header__img big";
+        img.src = "{{include.image}}";
+    };
+</script>
 
 <header class="header">
+    <img style="height: {{ hWRatio | times: 100 }}vw" class="header__img small" src="{{ include.dataUrl }}" alt="header image">
     <div class="header__container">
         <a href="{{ include.url }}" router-link class="header__h1">
             <h1>{{ include.title }}</h1>
@@ -19,7 +35,10 @@
             <p class="header__top-bar__user-name" hidden></p>
 
             <button class="header__top-bar__open-nav-button" hidden>
-                <img src="/assets/static/ic_menu_white_24px.svg" alt="open menu">
+                <svg id="hamburger" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
             </button>
 
             <section class="header__user card" hidden>

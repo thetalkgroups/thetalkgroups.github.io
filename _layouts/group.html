@@ -16,13 +16,15 @@
     {% include head.html head=page.head %}
 </head>
 
+
 <body>
     {% include header.html 
         title=data.header.title
         image=data.header.image 
+        dataUrl=data.header.dataUrl 
         color=data.header.color 
         width=data.header.width 
-        height=data.header.height 
+        height=data.header.height
         url=data.baseUrl
     %}
 

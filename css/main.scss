@@ -59,6 +59,7 @@ button {
     font-weight: bold;
     background: transparent;
     text-transform: uppercase;
+    cursor: pointer;
 }
 
 .card {
@@ -82,7 +83,20 @@ button {
         margin: 0;
         color: currentColor;
         text-transform: none;
-    }
+    }    
+}
+
+.header__img {
+    position: absolute;
+    width: 100%;
+}
+.header__img.small {
+    transition: opacity .3s;
+    opacity: 1;
+}
+.header__img.small[hidden] {
+    opacity: 0;
+    display: block;
 }
 
 .header__h1 {
@@ -126,6 +140,10 @@ button {
 }
 .header__top-bar__open-nav-button {
     margin-left: 16px;
+    color: currentColor;
+}
+#hamburger {
+    fill: currentColor;
 }
 .header__top-bar__sign-in-button {
     color: currentColor;
