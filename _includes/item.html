@@ -1,10 +1,13 @@
 <template id="reply">
     <img class="reply__photo" alt="photo">
     <section class="reply__text">
-        <section>
-            <p class="reply__name"></p>
-            <p class="reply__date"></p>
-        </section>
+        <header class="reply__header">
+            <section>
+                <p class="reply__name"></p>
+                <p class="reply__date"></p>
+            </section>
+            <button class="reply__delete" hidden>delete</button>
+        </header>
         <p class="reply__answer"></p>
         <img class="reply__image" alt="image" hidden>
     </section>
@@ -12,10 +15,16 @@
 
 <section class="item__header">
     <header class="item__header__top">
-        <img class="item__photo" alt="photo">
-        <section>
-            <p class="item__name"></p>
-            <p class="item__date"></p>
+        <section class="item__header__top__content">
+            <img class="item__photo" alt="photo">
+            <section>
+                <p class="item__name"></p>
+                <p class="item__date"></p>
+            </section>
+        </section>
+        <section class="item__header__top__buttons" hidden>
+            <button class="item__delete">delete</button>
+            <button class="item__set-sticky" hidden>set sticky</button>
         </section>
     </header>
     <h2 class="item__title"></h2>
