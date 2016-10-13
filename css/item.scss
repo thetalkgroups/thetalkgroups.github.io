@@ -32,27 +32,23 @@
 }
 
 .item__photo, .reply__photo {
-    width: auto;
-    height: auto;
+    width: 48px;
+    height: 48px;
     display: block;
     position: relative;
-    max-height: 48px;
-    max-width: 48px;
     margin-right: 16px;
     border-radius: 50%;
-
-    
 }
 .item__photo:after, .reply__photo:after {
     content: "";
     height: 48px;
     width: 48px;
-    background-image: url("/assets/static/user-photo-placeholder.svg");
-    background-size: 48px 48px;
+    background-image: url(/assets/static/user-photo-placeholder.svg);
     display: block;
     position: absolute;
     top: 0;
     left: 0;
+    background-size: 48px;
 }
 .item__name, .reply__name {
     text-transform: capitalize;
