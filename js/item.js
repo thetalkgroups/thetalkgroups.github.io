@@ -34,26 +34,28 @@ window.addEventListener("load", function () {
     api.list.getOne(id)
         .then(function (item) {
         itemPhoto.src = item.user.photo;
-        itemName.innerText = item.user.name;
-        itemDate.innerText = moment(item.date).fromNow();
-        itemTitle.innerText = item.title;
-        itemContent.innerText = item.content;
+        itemName.innerHTML = item.user.name;
+        itemDate.innerHTML = moment(item.date).fromNow();
+        itemTitle.innerHTML = item.title;
+        Object.keys(item.content)
+            .forEach(function (k) { return itemContent.innerHTML += "<div class=\"" + k + "\">" + item.content[k] + "</div>"; });
     })
         .catch(function (error) { return console.error(error); });
     api.replys.get(page)
         .then(function (replys) {
-        return replys.map(createReplyElement).forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
+        return replys.map(createReplyElement)
+            .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
     })
         .catch(function (error) { return console.error(error); });
     window.userService.user.subscribe(function (user) {
         if (!user) {
-            loginWarning.hidden = false;
-            reply.hidden = true;
+            loginWarning.removeAttribute("hidden");
+            reply.setAttribute("hidden", "");
             return;
         }
         delete user.id;
-        loginWarning.hidden = true;
-        reply.hidden = false;
+        loginWarning.setAttribute("hidden", "");
+        reply.removeAttribute("hidden");
         var onProgress = function (progress) {
             console.log(progress);
         };

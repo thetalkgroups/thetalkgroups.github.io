@@ -1,5 +1,5 @@
 interface Item {
-    _id?: string
+    _id: string
     user: User
     date?: number
     title: string
