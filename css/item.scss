@@ -24,10 +24,6 @@
 .item__header__top__buttons {
     button {
         padding: 8px;
-        margin-left: 8px;
-    }
-    button:first-child {
-        margin-left: 0;
     }
 }
 
@@ -58,6 +54,10 @@
 .item__date, .reply__date {
     font-size: 0.75em;
     color: #757575;
+}
+
+.replys > p {
+    margin: 16px 0;
 }
 
 .reply {
@@ -130,4 +130,13 @@
 .login-warning {
     padding: 16px 16px 0 16px;
     border-top: 1px solid #E0E0E0;
+}
+
+@media (max-width: 550px) {
+    .item__header__top {
+        flex-direction: column-reverse;
+    }
+    .item__header__top__buttons {
+        margin-bottom: 16px;
+    }
 }

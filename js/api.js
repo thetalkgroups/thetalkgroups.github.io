@@ -1,8 +1,5 @@
 var HOST = "http://localhost:4001";
 var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
-var _clearItemsFromCahce = function () { return Object.keys(localStorage)
-    .filter(function (k) { return k.startsWith("/group"); })
-    .forEach(function (k) { return localStorage.removeItem(k); }); };
 var formToJson = function (form) {
     var formData = new FormData(form);
     var json = {};
@@ -16,12 +13,16 @@ var escapeHtml = function (content) {
         return content.replace(/</g, "&lt;");
     return content;
 };
-function setCache(key, item) {
-    localStorage.setItem(key, JSON.stringify(item));
-}
+var setCache = function (key, item) {
+    return localStorage.setItem(key, JSON.stringify(item));
+};
 function getCache(key) {
     return JSON.parse(localStorage.getItem(key));
 }
+var updateCache = function (key, newProperties) {
+    var oldItem = getCache(key);
+    setCache(key, Object.assign(oldItem, newProperties));
+};
 var CachedList = (function () {
     function CachedList(prefix, isNew) {
         this.prefix = prefix;
@@ -42,27 +43,50 @@ var CachedList = (function () {
         return fetch("" + HOST + this.prefix + "/" + id, userId ? { headers: { "Authorization": userId } } : undefined)
             .then(function (res) { return res.json(); });
     };
-    CachedList.prototype.get = function (page, userId) {
+    CachedList.prototype._get = function (id) {
+        return getCache(this.prefix + "-" + id) || id;
+    };
+    CachedList.prototype._getNewItems = function (items, userId) {
+        var _this = this;
+        var newIds = items
+            .map(function (id, i) {
+            if (typeof id === "string") {
+                delete items[i];
+                return id;
+            }
+        })
+            .filter(Boolean);
+        if (newIds.length === 0)
+            return Promise.resolve(items);
+        return this.fetchAll(newIds, userId)
+            .then(function (newItems) {
+            newItems.forEach(function (newItem) {
+                return setCache(_this.prefix + "-" + newItem._id, newItem);
+            });
+            return items.concat(newItems);
+        });
+    };
+    CachedList.prototype.getReplyList = function (page, userId) {
         var _this = this;
         return this.fetchList(page)
-            .then(function (ids) { return ids.map(function (id) { return getCache(_this.prefix + "-" + id) || id; }); })
+            .then(function (ids) { return ids.map(function (id) { return _this._get(id); }); })
+            .then(function (items) { return _this._getNewItems(items, userId); });
+    };
+    CachedList.prototype.getItemList = function (page, userId) {
+        var _this = this;
+        return this.fetchList(page)
+            .then(function (ids) { return ({
+            normal: ids.normal.map(function (id) { return _this._get(id); }),
+            sticky: ids.sticky.map(function (id) { return _this._get(id); })
+        }); })
             .then(function (items) {
-            var newIds = items
-                .map(function (id, i) {
-                if (typeof id === "string") {
-                    delete items[i];
-                    return id;
-                }
-            })
-                .filter(Boolean);
-            if (newIds.length === 0)
-                return items;
-            return _this.fetchAll(newIds, userId)
-                .then(function (newItems) {
-                newItems.forEach(function (newItem) {
-                    return setCache(_this.prefix + "-" + newItem._id, newItem);
+            return _this._getNewItems(items.normal, userId).then(function (normal) {
+                return _this._getNewItems(items.sticky, userId).then(function (sticky) {
+                    console.log(_this.prefix, normal, sticky);
+                    normal.forEach(function (item) { return updateCache(_this.prefix + "-" + item._id, { sticky: false }); });
+                    sticky.forEach(function (item) { return updateCache(_this.prefix + "-" + item._id, { sticky: true }); });
+                    return { normal: normal, sticky: sticky };
                 });
-                return items.concat(newItems);
             });
         });
     };
@@ -130,6 +154,15 @@ var Api = (function () {
     }
     Api.prototype.getImageUrl = function (image) {
         return HOST + "/files/" + image;
+    };
+    Api.prototype.setSticky = function (userId, sticky) {
+        if (sticky === void 0) { sticky = false; }
+        localStorage.removeItem(this.prefix + "-" + this.itemId);
+        return fetch("" + HOST + this.prefix + "/" + this.itemId + "/sticky", {
+            method: "POST",
+            body: JSON.stringify({ value: sticky }),
+            headers: { "Content-Type": "application/json", "Authorization": userId }
+        });
     };
     return Api;
 }());

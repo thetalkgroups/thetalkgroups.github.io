@@ -28,7 +28,7 @@ window.addEventListener("load", function () {
             }, {});
             var data = {
                 _id: undefined,
-                isYou: undefined,
+                permission: undefined,
                 title: escapeHtml(formData["title"]),
                 user: { id: user.id, name: user.name, photo: user.photo },
                 content: otherFormData,

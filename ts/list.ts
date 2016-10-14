@@ -2,11 +2,14 @@ const pageMatch = location.search.match(/page=(\d+)/);
 let page = 1;
 
 if (pageMatch) page = parseInt(pageMatch[1], 10) || 1;
-const itemSinglar = location.pathname.match(/(\w+)\/$/)[1].replace(/s$/, "");
-let listEl = document.querySelector(".list")
+const listNormal = document.querySelector(".list__normal");
+const listSticky = document.querySelector(".list__sticky");
 
-api.list.get(page)
-    .then(items => items.map(createListItemElement).forEach(itemEl => listEl.appendChild(itemEl)))
+api.items.getItemList(page)
+    .then(items => {
+        items.sticky.map(createListItemElement).forEach(itemEl => listSticky.appendChild(itemEl));
+        items.normal.map(createListItemElement).forEach(itemEl => listNormal.appendChild(itemEl));
+    })
     .then(_ => {
         const questionListEl = document.querySelector(".list") as HTMLElement;
         const askAQuestion = document.querySelector(".list-header__add-item") as HTMLElement

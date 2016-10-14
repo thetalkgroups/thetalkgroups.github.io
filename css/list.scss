@@ -17,6 +17,10 @@
     padding: 8px;
 }
 
+.list__sticky .list-item:last-child {
+    margin-bottom: 16px;
+}
+
 .list-item {
     display: flex;
     flex-direction: column;

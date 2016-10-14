@@ -1,5 +1,17 @@
 declare const headerImageHWRatio: number;
 
+const clearItemsFromCahce = () => Object.keys(localStorage)
+    .filter(k => k.startsWith("/group"))
+    .forEach(k => localStorage.removeItem(k));
+
+const isParentOf = (target: HTMLElement, selector: string): boolean => {
+    if (target.nodeName === "HTML") return false;
+
+    if (target.matches(selector)) return true;
+
+    return isParentOf(target.parentNode as HTMLElement, selector);
+};
+
 window.addEventListener("load", () => {
     const navigation = document.querySelector(".navigation");
     const header = document.querySelector(".header") as HTMLElement;
@@ -16,14 +28,6 @@ window.addEventListener("load", () => {
     const signOutButton = document.querySelector(".header__user__sign-out-button");
 
     signInButton.hidden = false;
-
-    const isParentOf = (target: HTMLElement, selector: string): boolean => {
-        if (target.nodeName === "HTML") return false;
-
-        if (target.matches(selector)) return true;
-
-        return isParentOf(target.parentNode as HTMLElement, selector);
-    };
 
     const openNav = () => {
         navigation.classList.add("open");
@@ -104,6 +108,8 @@ window.addEventListener("load", () => {
     }
 
     const signOut = () => {
+        clearItemsFromCahce();
+
         hideUserCard({ target: document.body, preventDefault: () => null as any } as any)
 
         window.userService.signOut();

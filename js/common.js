@@ -1,3 +1,13 @@
+var clearItemsFromCahce = function () { return Object.keys(localStorage)
+    .filter(function (k) { return k.startsWith("/group"); })
+    .forEach(function (k) { return localStorage.removeItem(k); }); };
+var isParentOf = function (target, selector) {
+    if (target.nodeName === "HTML")
+        return false;
+    if (target.matches(selector))
+        return true;
+    return isParentOf(target.parentNode, selector);
+};
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");
@@ -13,13 +23,6 @@ window.addEventListener("load", function () {
     var userPhoto = document.querySelector(".header__user__photo");
     var signOutButton = document.querySelector(".header__user__sign-out-button");
     signInButton.hidden = false;
-    var isParentOf = function (target, selector) {
-        if (target.nodeName === "HTML")
-            return false;
-        if (target.matches(selector))
-            return true;
-        return isParentOf(target.parentNode, selector);
-    };
     var openNav = function () {
         navigation.classList.add("open");
         setTimeout(function () { return document.addEventListener("click", shadowClose); });
@@ -84,6 +87,7 @@ window.addEventListener("load", function () {
         document.removeEventListener("click", hideUserCard);
     };
     var signOut = function () {
+        clearItemsFromCahce();
         hideUserCard({ target: document.body, preventDefault: function () { return null; } });
         window.userService.signOut();
     };

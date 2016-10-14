@@ -38,7 +38,7 @@ window.addEventListener("load", () => {
 
             const data: Item = {
                 _id: undefined,
-                isYou: undefined,
+                permission: undefined,
                 title: escapeHtml(formData["title"] as string), 
                 user: { id: user.id, name: user.name, photo: user.photo },
                 content: otherFormData, 

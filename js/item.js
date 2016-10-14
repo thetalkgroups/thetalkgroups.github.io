@@ -17,10 +17,10 @@ var createReplyElement = function (reply, userId) {
         image.hidden = false;
         image.src = api.getImageUrl(reply.image);
     }
-    if (reply.isYou) {
+    if (reply.permission === "you" || reply.permission === "admin") {
         deleteBtn.removeAttribute("hidden");
         deleteBtn.onclick = function (_) { return api.replys.delete(reply._id, userId)
-            .then(function () { return location.href = location.href; })
+            .then(function (_) { return location.href = location.href; })
             .catch(function (error) { return console.error(error); }); };
     }
     return el;
@@ -36,6 +36,7 @@ window.addEventListener("load", function () {
     var reply = document.querySelector(".reply-form");
     var buttons = document.querySelector(".item__header__top__buttons");
     var deleteBtn = document.querySelector(".item__delete");
+    var stickyButton = document.querySelector(".item__sticky");
     var page = 1;
     var pageMatch = location.search.match(/page=(\d+)/);
     if (pageMatch)
@@ -48,23 +49,37 @@ window.addEventListener("load", function () {
             itemName.innerHTML = item.user.name;
             itemDate.innerHTML = moment(item.date).fromNow();
             itemTitle.innerHTML = item.title;
-            if (item.isYou) {
+            if (item.permission === "you" || item.permission === "admin") {
                 buttons.removeAttribute("hidden");
+                deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSinglar + "?")
+                    ? api.items.delete(id, userId)
+                        .then(function (_) { return location.href = location.href.replace(/\w+\.html.*?$/, ""); })
+                        .catch(function (error) { return console.error(error); })
+                    : undefined; };
+                if (item.permission === "admin") {
+                    stickyButton.removeAttribute("hidden");
+                    stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
+                    stickyButton.onclick = function (_) { return confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar))
+                        ? api.setSticky(userId, item.sticky)
+                            .then(function (_) { return location.href = location.href; })
+                            .catch(function (error) { return console.error(error); })
+                        : undefined; };
+                }
             }
-            itemContent.innerHTML = "";
-            Object.keys(item.content)
-                .forEach(function (k) { return itemContent.innerHTML += "<div class=\"" + k + "\">" + item.content[k] + "</div>"; });
+            var content = Object.keys(item.content)
+                .reduce(function (content, k) { return content + ("<div class=\"" + k + "\">" + item.content[k] + "</div>"); });
+            itemContent.innerHTML = content;
         })
             .catch(function (error) { return console.error(error); });
-        api.replys.get(page, userId)
+        api.replys.getReplyList(page, userId)
             .then(function (replys) {
-            return replys.map(function (reply) { return createReplyElement(reply, userId); })
+            if (replys.length === 0) {
+                replysEl.innerHTML = "<p>there are no replys yet</p>";
+            }
+            replys.map(function (reply) { return createReplyElement(reply, userId); })
                 .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
         })
             .catch(function (error) { return console.error(error); });
-        deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSinglar + "?") ? api.items.delete(id, userId)
-            .then(function () { return location.href = location.href.replace(/\w+\.html.*?$/, ""); })
-            .catch(function (error) { return console.error(error); }) : undefined; };
         if (!user) {
             loginWarning.removeAttribute("hidden");
             reply.setAttribute("hidden", "");

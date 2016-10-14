@@ -1,10 +1,6 @@
 const HOST = "http://localhost:4001"
 const itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
 
-const _clearItemsFromCahce = () => Object.keys(localStorage)
-    .filter(k => k.startsWith("/group"))
-    .forEach(k => localStorage.removeItem(k));
-
 const formToJson = (form: HTMLFormElement): { [key: string]: any} => {
     const formData = new FormData(form);
     const json: { [key: string]: any } = {};
@@ -23,14 +19,19 @@ const escapeHtml = (content: any) => {
     return content;
 }
 
-function setCache(key: string, item: any) {
+const setCache = (key: string, item: any) => 
     localStorage.setItem(key, JSON.stringify(item));
-}
 function getCache<a>(key: string): a {
     return JSON.parse(localStorage.getItem(key));
 }
+const updateCache = (key: string, newProperties: { [key: string]: any}) => {
+    const oldItem = getCache(key);
 
-class CachedList<a extends { _id: string}> {
+    setCache(key, Object.assign(oldItem, newProperties))
+}
+
+
+class CachedList<a extends { _id: string }> {
     constructor(private prefix: string, private isNew: (item: a) => boolean) {}
 
     private fetchAll(ids: string[], userId?: string): Promise<a[]> {
@@ -41,7 +42,7 @@ class CachedList<a extends { _id: string}> {
         }).then(res => res.json());
     }
 
-    private fetchList(page: number): Promise<string[]> {
+    private fetchList(page: number): Promise<{ sticky: string[], normal: string[] } | string[]> {
         return fetch(`${HOST}${this.prefix}/list/${page}`)
             .then(res => res.json());
     }
@@ -53,30 +54,52 @@ class CachedList<a extends { _id: string}> {
             .then(res => res.json());
     }
 
-    public get(page: number, userId?: string): Promise<a[]> {
+    private _get(id: string ) {
+        return getCache<a>(`${this.prefix}-${id}`) || id
+    }
+
+    private _getNewItems(items: (string | a)[], userId: string): Promise<a[]> {
+        const newIds = items
+            .map((id, i) => {
+                if (typeof id === "string") {
+                    delete items[i];
+
+                    return id;
+                }
+            })
+            .filter(Boolean) as string[];
+
+        if (newIds.length === 0) return Promise.resolve(items);
+
+        return this.fetchAll(newIds, userId)
+            .then(newItems => {
+                newItems.forEach(newItem => 
+                    setCache(`${this.prefix}-${newItem._id}`, newItem));
+
+                return items.concat(newItems);
+            })
+    }
+
+    public getReplyList(page: number, userId?: string): Promise<a[]> {
         return this.fetchList(page)
-            .then(ids => ids.map(id => getCache<a>(`${this.prefix}-${id}`) || id))
-            .then(items => {
-                const newIds = items
-                    .map((id, i) => {
-                        if (typeof id === "string") {
-                            delete items[i];
+            .then((ids: string[]) => ids.map(id => this._get(id)))
+            .then(items => this._getNewItems(items, userId));
+    }
+    public getItemList(page: number, userId?: string): Promise<{ normal: a[], sticky: a[]}> {
+        return this.fetchList(page)
+            .then((ids: { normal: string[], sticky: string[] }) => ({
+                normal: ids.normal.map(id => this._get(id)),
+                sticky: ids.sticky.map(id => this._get(id))
+            }))
+            .then(items => 
+                this._getNewItems(items.normal, userId).then(normal => 
+                this._getNewItems(items.sticky, userId).then(sticky => {
+                    console.log(this.prefix, normal, sticky)
+                    normal.forEach(item => updateCache(`${this.prefix}-${item._id}`, { sticky: false }))
+                    sticky.forEach(item => updateCache(`${this.prefix}-${item._id}`, { sticky: true }))
 
-                            return id;
-                        }
-                    })
-                    .filter(Boolean) as string[];
-
-                if (newIds.length === 0) return items;
-
-                return this.fetchAll(newIds, userId)
-                    .then(newItems => {
-                        newItems.forEach(newItem => 
-                            setCache(`${this.prefix}-${newItem._id}`, newItem));
-
-                        return items.concat(newItems);
-                    })
-            });
+                    return { normal, sticky }
+                })));
     }
 
     public getOne(id: string, userId?: string): Promise<a> {
@@ -152,5 +175,15 @@ class Api {
 
     public getImageUrl(image: string): string {
         return HOST + "/files/" + image;
+    }
+
+    public setSticky(userId: string, sticky: boolean = false) {
+        localStorage.removeItem(`${this.prefix}-${this.itemId}`)
+
+        return fetch(`${HOST}${this.prefix}/${this.itemId}/sticky`, {
+            method: "POST",
+            body: JSON.stringify({ value: sticky }),
+            headers: { "Content-Type": "application/json", "Authorization": userId }
+        })
     }
 }

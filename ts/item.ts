@@ -25,11 +25,11 @@ const createReplyElement = (reply: Reply, userId: string) => {
         image.src = api.getImageUrl(reply.image)
     }
 
-    if (reply.isYou) {
+    if (reply.permission === "you" || reply.permission === "admin") {
         deleteBtn.removeAttribute("hidden");
 
         deleteBtn.onclick = _ => api.replys.delete(reply._id, userId)
-            .then(() => location.href = location.href)
+            .then(_ => location.href = location.href)
             .catch(error => console.error(error));
     }
 
@@ -47,6 +47,7 @@ window.addEventListener("load", () => {
     const reply = document.querySelector(".reply-form") as HTMLFormElement;
     const buttons = document.querySelector(".item__header__top__buttons");
     const deleteBtn = document.querySelector(".item__delete") as HTMLButtonElement;
+    const stickyButton = document.querySelector(".item__sticky") as HTMLButtonElement;
 
     let page = 1;
     const pageMatch = location.search.match(/page=(\d+)/);
@@ -63,26 +64,45 @@ window.addEventListener("load", () => {
                 itemDate.innerHTML = moment(item.date).fromNow();
                 itemTitle.innerHTML = item.title;
 
-                if (item.isYou) {
+                if (item.permission === "you" || item.permission === "admin") {
                     buttons.removeAttribute("hidden");
+
+                    deleteBtn.onclick = _ => confirm(`Are you sure you want do delete this ${itemSinglar}?`) 
+                        ? api.items.delete(id, userId)
+                            .then(_ => location.href = location.href.replace(/\w+\.html.*?$/, ""))
+                            .catch(error => console.error(error)) 
+                        : undefined;
+
+                    if (item.permission === "admin") {
+                        stickyButton.removeAttribute("hidden");
+
+                        stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
+
+                        stickyButton.onclick = _ => confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar)) 
+                            ? api.setSticky(userId, item.sticky)
+                                .then(_ => location.href = location.href)
+                                .catch(error => console.error(error))
+                            : undefined
+                    }
                 }
+                
+                const content = Object.keys(item.content)
+                    .reduce((content, k) => content + `<div class="${k}">${item.content[k]}</div>`);
 
-                itemContent.innerHTML = "";
-
-                Object.keys(item.content)
-                    .forEach(k => itemContent.innerHTML += `<div class="${k}">${item.content[k]}</div>`);
+                itemContent.innerHTML = content;
             })
             .catch(error => console.error(error));
 
-        api.replys.get(page, userId)
-            .then(replys => 
-                replys.map(reply => createReplyElement(reply, userId))
-                    .forEach(replyEl => replysEl.appendChild(replyEl)))
-            .catch(error => console.error(error));
+        api.replys.getReplyList(page, userId)
+            .then(replys => {
+                if (replys.length === 0) {
+                    replysEl.innerHTML = "<p>there are no replys yet</p>";
+                }
 
-        deleteBtn.onclick = _ => confirm(`Are you sure you want do delete this ${itemSinglar}?`) ? api.items.delete(id, userId)
-            .then(() => location.href = location.href.replace(/\w+\.html.*?$/, ""))
-            .catch(error => console.error(error)) : undefined;
+                replys.map(reply => createReplyElement(reply, userId))
+                    .forEach(replyEl => replysEl.appendChild(replyEl))
+            })
+            .catch(error => console.error(error));
 
         if (!user) {
             loginWarning.removeAttribute("hidden");
