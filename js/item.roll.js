@@ -175,11 +175,6 @@ var formToJson = function (form) {
     });
     return json;
 };
-var escapeHtml = function (content) {
-    if (typeof content === "string")
-        return content.replace(/</g, "&lt;");
-    return content;
-};
 var setItemToCache = function (prefix, item) { return localStorage.setItem(prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
 var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem(prefix.replace("/sticky", "") + "/" + id)); };
 
@@ -422,7 +417,7 @@ window.addEventListener("load", function () {
             event.preventDefault();
             var data = formToJson(reply);
             Object.keys(data).filter(function (k) { return k !== "image"; })
-                .forEach(function (k) { return data[k] = escapeHtml(data[k]); });
+                .forEach(function (k) { return data[k] = data[k]; });
             data["user"] = user;
             addReply(data, onProgress)
                 .then(function () { return location.href = location.href; })

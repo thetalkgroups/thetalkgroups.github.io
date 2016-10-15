@@ -175,11 +175,6 @@ var formToJson = function (form) {
     });
     return json;
 };
-var escapeHtml = function (content) {
-    if (typeof content === "string")
-        return content.replace(/</g, "&lt;");
-    return content;
-};
 
 var addItem = function (data) {
     return fetch(HOST + prefix, {
@@ -213,13 +208,13 @@ window.addEventListener("load", function () {
             var formData = formToJson(form);
             var otherFormData = Object.keys(formData).filter(function (k) { return k === "title"; })
                 .reduce(function (obj, k) {
-                obj[k] = escapeHtml(formData[k]);
+                obj[k] = formData[k];
                 return obj;
             }, {});
             var data = {
                 _id: undefined,
                 permission: undefined,
-                title: escapeHtml(formData["title"]),
+                title: formData["title"],
                 user: { id: user.id, name: user.name, photo: user.photo },
                 content: otherFormData,
                 fields: fields.map(function (field) { return field.name; })

@@ -168,7 +168,6 @@ window.addEventListener("load", function () {
 var HOST = "http://localhost:4001";
 var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
 
-
 var setItemToCache = function (prefix, item) { return localStorage.setItem(prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
 var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem(prefix.replace("/sticky", "") + "/" + id)); };
 
