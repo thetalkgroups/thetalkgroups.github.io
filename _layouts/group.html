@@ -7,8 +7,6 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="/css/group.css" async>
-
     <style>
         @media (max-width: 550px) {
             .header__user {
@@ -18,7 +16,7 @@
     </style>
 
     <script>
-        window.GROUP_URL = "{{ data.baseUrl }}";
+        GROUP_URL = "{{ data.baseUrl }}";
     </script>
 
     {% include head.html head=page.head %}

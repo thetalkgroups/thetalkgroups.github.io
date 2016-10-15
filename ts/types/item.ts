@@ -1,4 +1,6 @@
-interface Item {
+import { User } from "./user"
+
+export interface Item {
     _id: string
     user: User
     date?: number
@@ -9,7 +11,7 @@ interface Item {
     permission: string
 }
 
-interface Reply {
+export interface Reply {
     _id: string
     itemId: string
     user: User

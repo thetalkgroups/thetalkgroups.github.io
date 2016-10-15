@@ -1,4 +1,4 @@
-class EventEmitter<T> {
+export class EventEmitter<T> {
     nextId = 0;
     subscribers: { id: number, func: (value: T) => void }[] = []
     value: T

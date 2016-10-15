@@ -1,19 +1,23 @@
+import { EventEmitter } from "./event-emitter";
+import { userService } from "./globals";
+import { User } from "./types/user";
+
 declare const firebase: any;
 
-var config = {
+const config = {
     apiKey: "AIzaSyAjSDRU_Sl8DbTftnDghDsZJsxlAEvQpxE",
     authDomain: "fir-auth-test-fe62c.firebaseapp.com",
     databaseURL: "https://fir-auth-test-fe62c.firebaseio.com"
-}
+};
 const providers: { [provider: string]: any } = {
     "google": new firebase.auth.GoogleAuthProvider(),
     "twitter": new firebase.auth.TwitterAuthProvider(),
     "facebook": new firebase.auth.FacebookAuthProvider()
-}
+};
 
-firebase.initializeApp(config)
+firebase.initializeApp(config);
 
-class UserService {
+export class UserService {
     user = new EventEmitter<User>()
 
     constructor() {
@@ -35,5 +39,3 @@ class UserService {
         return firebase.auth().signOut();
     }
 }
-
-window.userService = new UserService()

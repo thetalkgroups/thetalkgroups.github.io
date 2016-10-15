@@ -4,13 +4,15 @@
   "description": "thetalkgroups forum",
   "main": "none",
   "devDependencies": {
-    "typings": "^1.4.0",
-    "typescript": "^2.0.3"
+    "rollup": "^0.36.3",
+    "typescript": "^2.0.3",
+    "typings": "^1.4.0"
   },
   "scripts": {
-      "postinstall": "typings install",
-      "build": "tsc",
-      "build:w": "tsc -w"
+    "postinstall": "typings install",
+    "build": "tsc",
+    "build:w": "tsc -w",
+    "roll": "rollup -m -o js/common.roll.js js/common.js && rollup -m -o js/sign-in.roll.js js/sign-in.js && rollup -m -o js/item.roll.js js/item.js && rollup -m -o js/list.roll.js js/list.js && rollup -m -o js/add-item.roll.js js/add-item.js"
   },
   "author": "mathias hansen",
   "license": "UNLICENSED",

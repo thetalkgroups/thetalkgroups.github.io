@@ -1,8 +1,8 @@
-declare const headerImageHWRatio: number;
+import "./user-service"
+import { clearItemsFromCahce, userService } from "./globals"
+import { User } from "./types/user";
 
-const clearItemsFromCahce = () => Object.keys(localStorage)
-    .filter(k => k.startsWith("/group"))
-    .forEach(k => localStorage.removeItem(k));
+declare const headerImageHWRatio: number;
 
 const isParentOf = (target: HTMLElement, selector: string): boolean => {
     if (target.nodeName === "HTML") return false;
@@ -112,10 +112,10 @@ window.addEventListener("load", () => {
 
         hideUserCard({ target: document.body, preventDefault: () => null as any } as any)
 
-        window.userService.signOut();
+        userService.signOut();
     }
 
-    window.userService.user.subscribe(updateUser);
+    userService.user.subscribe(updateUser);
 
     document.addEventListener("scroll", resizeNav);
 

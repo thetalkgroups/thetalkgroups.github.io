@@ -1,6 +1,7 @@
 --- 
 layout: main
 head: >
+    <script src="/js/common.roll.js" async defer></script>
     <link rel="stylesheet" href="/css/home.css" async/> 
 ---
 {::options parse_block_html="true" /}

@@ -1,3 +1,6 @@
+import "./common"
+import { clearItemsFromCahce, userService } from "./globals"
+
 window.addEventListener("load", () => {
     const signInButtonGoogle = document.querySelector(".sign-in__button.google");
     const signInButtonFacebook = document.querySelector(".sign-in__button.facebook");
@@ -5,7 +8,7 @@ window.addEventListener("load", () => {
 
     const signIn = (provider: string) => {
         clearItemsFromCahce();
-        window.userService.signIn(provider).then(() => history.back());
+        userService.signIn(provider).then(() => history.back());
     }
 
     signInButtonGoogle.addEventListener("click", () => signIn("google"));

@@ -4,22 +4,18 @@ group: thc
 head: >
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js" async defer></script>
     <link rel="stylesheet" href="/css/item.css" async>
-    <script src="/js/api.js"></script>
     <script>
-        // TODO pagination
         const idMatch = location.search.match(/id=(\w+)/);
-        let api;
-        let id
 
         if (!idMatch) {
             console.error("id missing");
         }
         else {
             id = idMatch[1];
-            api = new Api(`/group${window.GROUP_URL}/questions`, id, question => !question || !question.content)
+            prefix = `/group${window.GROUP_URL}/questions`;
         }
     </script>
-    <script src="/js/item.js" async></script>
+    <script src="/js/item.roll.js" async defer></script>
 ---
 
 {% include item.html %}

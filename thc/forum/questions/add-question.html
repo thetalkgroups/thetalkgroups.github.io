@@ -2,14 +2,13 @@
 layout: group
 group: thc
 head: >
-    <script src="/js/api.js"></script>
     <script>
-        const api = new Api(`/group${window.GROUP_URL}/questions`)
+        const prefix = `/group${window.GROUP_URL}/questions`;
         const fields = [
             { name: "content", type: "textarea", required: true }
-        ]
+        ];
     </script>
-    <script src="/js/add-item.js" async defer></script>
+    <script src="/js/add-item.roll.js" async defer></script>
     <link rel="stylesheet" href="/css/add-item.css" async>
 ---
 

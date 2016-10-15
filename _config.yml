@@ -12,6 +12,10 @@ exclude: [
     "ts"
 ]
 
+defaults: 
+    - values: 
+        head: <script src="js/common.roll.js" async></script>
+
 prose: 
     media: assets/content
     ignore: [

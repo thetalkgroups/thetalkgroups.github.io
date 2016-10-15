@@ -1,4 +1,16 @@
+import { formToJson, HOST, escapeHtml, } from "./api-globals"
+import { userService } from "./globals"
+import { Item } from "./types/item"
+
 declare const fields: { name: string, type: string, required: boolean }[]
+declare const prefix: string
+
+const addItem = (data: any) =>
+    fetch(HOST + prefix, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
 
 window.addEventListener("load", () => {
     const loginWarning = document.querySelector(".login-warning") as HTMLElement;
@@ -20,7 +32,7 @@ window.addEventListener("load", () => {
         fieldsEl.appendChild(input);
     })
 
-    window.userService.user.subscribe(user => {
+    userService.user.subscribe(user => {
         if (!user) return;
 
         form.hidden = false;
@@ -45,7 +57,7 @@ window.addEventListener("load", () => {
                 fields: fields.map(field => field.name) 
             };
 
-            api.items.add(data)
+            addItem(data)
                 .then(() => location.href = location.href.replace(/[\w-]+\.html$/, ""))
                 .catch(error => console.error(error));
 
