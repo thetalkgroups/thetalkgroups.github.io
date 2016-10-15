@@ -2,14 +2,15 @@
 layout: group
 group: thc
 head: >
-    <script>
-        const prefix = `/group${window.GROUP_URL}/questions`;
-        const fields = [
-            { name: "content", type: "textarea", required: true }
-        ];
-    </script>
-    <script src="/js/add-item.roll.js" async defer></script>
-    <link rel="stylesheet" href="/css/add-item.css" async>
+    <link rel="stylesheet" href="/css/add-item.css" async/>
 ---
+
+<script>
+    const prefix = "{{ site.data[page.group].baseUrl }}/questions";
+    const fields = [
+        { name: "content", type: "textarea", required: true }
+    ];
+</script>
+<script src="/js/add-item.roll.js" async defer></script>
 
 {% include add-item.html %}

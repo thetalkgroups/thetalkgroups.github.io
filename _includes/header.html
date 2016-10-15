@@ -12,7 +12,7 @@
 <script>
     const headerImageHWRatio = {{ hWRatio }};
     
-    window.onload = function () {
+    window.addEventListener("load", function () {
         const header = document.querySelector(".header");
         const img = document.createElement("img");
         const headerImg = document.querySelector(".header__img");
@@ -23,7 +23,7 @@
         }
         img.className = "header__img big";
         img.src = "{{include.image}}";
-    };
+    });
 </script>
 
 <header class="header">

@@ -50,10 +50,10 @@ window.addEventListener("load", () => {
     const smallHeaderHeight = 72;
     const topElement = breadcrumb || wrapper;
     const topElementMargin = 16;
-    const resizeNav = () => {
+    const resizeHeader = () => {
         const headerHeight = document.body.getBoundingClientRect().right * headerImageHWRatio;
         const headerHiddenHeight = headerHeight - smallHeaderHeight;
-        const scrollTop = document.body.scrollTop;
+        const scrollTop = window.scrollY;
 
         if (scrollTop > headerHiddenHeight) {
             header.style.top = -headerHiddenHeight + "px";
@@ -117,7 +117,7 @@ window.addEventListener("load", () => {
 
     userService.user.subscribe(updateUser);
 
-    document.addEventListener("scroll", resizeNav);
+    window.addEventListener("scroll", resizeHeader);
 
     openNavButton.addEventListener("click", openNav);
     closeNavButton.addEventListener("click", closeNav);

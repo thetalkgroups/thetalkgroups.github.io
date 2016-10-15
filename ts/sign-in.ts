@@ -1,4 +1,4 @@
-import "./common"
+import "./common";
 import { clearItemsFromCahce, userService } from "./globals"
 
 window.addEventListener("load", () => {

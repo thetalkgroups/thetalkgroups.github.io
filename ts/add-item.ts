@@ -1,3 +1,4 @@
+import "./common";
 import { formToJson, HOST, escapeHtml, } from "./api-globals"
 import { userService } from "./globals"
 import { Item } from "./types/item"

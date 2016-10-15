@@ -10,8 +10,9 @@
   },
   "scripts": {
     "postinstall": "typings install",
-    "build": "tsc",
-    "build:w": "tsc -w",
+    "build": "tsc && npm run roll",
+    "build:w": "tsc -w && npm run roll:w",
+    "roll:w": "rollup -m -w -o js/common.roll.js js/common.js && rollup -m -w -o js/sign-in.roll.js js/sign-in.js && rollup -m -w -o js/item.roll.js js/item.js && rollup -m -w -o js/list.roll.js js/list.js && rollup -m -w -o js/add-item.roll.js js/add-item.js",
     "roll": "rollup -m -o js/common.roll.js js/common.js && rollup -m -o js/sign-in.roll.js js/sign-in.js && rollup -m -o js/item.roll.js js/item.js && rollup -m -o js/list.roll.js js/list.js && rollup -m -o js/add-item.roll.js js/add-item.js"
   },
   "author": "mathias hansen",

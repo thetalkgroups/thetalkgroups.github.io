@@ -1,60 +1,3 @@
-var HOST = "http://localhost:4001";
-var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
-var formToJson = function (form) {
-    var formData = new FormData(form);
-    var json = {};
-    formData["forEach"](function (data, key) {
-        json[key] = data;
-    });
-    return json;
-};
-var escapeHtml = function (content) {
-    if (typeof content === "string")
-        return content.replace(/</g, "&lt;");
-    return content;
-};
-var setItemToCache = function (prefix, item) { return localStorage.setItem(prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
-var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem(prefix.replace("/sticky", "") + "/" + id)); };
-
-var List = (function () {
-    function List(prefix) {
-        this.prefix = prefix;
-    }
-    List.prototype.getItems = function (page, offset, userId) {
-        var _this = this;
-        if (offset === void 0) { offset = 0; }
-        return this.listItems(page, offset).then(function (ids) {
-            var cachedItems = [];
-            var newIds = [];
-            ids.forEach(function (id) {
-                var cachedItem = getItemFromCache(_this.prefix, id);
-                if (cachedItem)
-                    cachedItems.push(cachedItem);
-                else
-                    newIds.push(id);
-            });
-            return _this.fetchItems(newIds, userId).then(function (newItems) {
-                newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
-                return cachedItems.concat(newItems);
-            });
-        });
-    };
-    List.prototype.listItems = function (page, offset) {
-        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset).then(function (res) { return res.json(); });
-    };
-    List.prototype.fetchItems = function (ids, userId) {
-        return fetch(HOST + this.prefix + "/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": userId
-            },
-            body: JSON.stringify(ids)
-        }).then(function (res) { return res.json(); });
-    };
-    return List;
-}());
-
 var EventEmitter = (function () {
     function EventEmitter() {
         this.nextId = 0;
@@ -119,7 +62,165 @@ var UserService = (function () {
     return UserService;
 }());
 
+var clearItemsFromCahce = function () { return Object.keys(localStorage)
+    .filter(function (k) { return k.startsWith("/group"); })
+    .forEach(function (k) { return localStorage.removeItem(k); }); };
 var userService = new UserService();
+
+var isParentOf = function (target, selector) {
+    if (target.nodeName === "HTML")
+        return false;
+    if (target.matches(selector))
+        return true;
+    return isParentOf(target.parentNode, selector);
+};
+window.addEventListener("load", function () {
+    var navigation = document.querySelector(".navigation");
+    var header = document.querySelector(".header");
+    var breadcrumb = document.querySelector(".breadcrumb");
+    var wrapper = document.querySelector(".wrapper");
+    var openNavButton = document.querySelector(".header__top-bar__open-nav-button");
+    var closeNavButton = document.querySelector(".navigation__close-nav-button");
+    var userNameOnly = document.querySelector(".header__top-bar__user-name");
+    var signInButton = document.querySelector(".header__top-bar__sign-in-button");
+    var userCard = document.querySelector(".header__user");
+    var userName = document.querySelector(".header__user__name");
+    var userEmail = document.querySelector(".header__user__email");
+    var userPhoto = document.querySelector(".header__user__photo");
+    var signOutButton = document.querySelector(".header__user__sign-out-button");
+    signInButton.hidden = false;
+    var openNav = function () {
+        navigation.classList.add("open");
+        setTimeout(function () { return document.addEventListener("click", shadowClose); });
+    };
+    var shadowClose = function (_a) {
+        var target = _a.target;
+        if (isParentOf(target, ".navigation"))
+            return;
+        closeNav();
+    };
+    var closeNav = function () {
+        navigation.classList.remove("open");
+        document.removeEventListener("click", shadowClose);
+    };
+    var smallHeaderHeight = 72;
+    var topElement = breadcrumb || wrapper;
+    var topElementMargin = 16;
+    var resizeHeader = function () {
+        var headerHeight = document.body.getBoundingClientRect().right * headerImageHWRatio;
+        var headerHiddenHeight = headerHeight - smallHeaderHeight;
+        var scrollTop = window.scrollY;
+        if (scrollTop > headerHiddenHeight) {
+            header.style.top = -headerHiddenHeight + "px";
+            topElement.style.marginTop = headerHeight + topElementMargin + "px";
+            header.classList.add("small");
+        }
+        else {
+            topElement.removeAttribute("style");
+            header.classList.remove("small");
+        }
+    };
+    var updateUser = function (user) {
+        if (!user) {
+            signInButton.hidden = false;
+            userNameOnly.hidden = true;
+            userCard.classList.add("not-signed-in");
+        }
+        else {
+            signInButton.hidden = true;
+            userNameOnly.hidden = false;
+            userCard.classList.remove("not-signed-in");
+            userNameOnly.innerText = user.name;
+            userName.innerText = user.name;
+            userEmail.innerText = user.email;
+            userPhoto.src = user.photo;
+        }
+    };
+    var hidden = true;
+    var showUserCard = function () {
+        userCard.hidden = false;
+        if (hidden) {
+            setTimeout(function () { return document.addEventListener("click", hideUserCard); });
+            hidden = false;
+        }
+    };
+    var hideUserCard = function (event) {
+        event.preventDefault();
+        if (isParentOf(event.target, ".header__user"))
+            return;
+        hidden = true;
+        userCard.hidden = true;
+        document.removeEventListener("click", hideUserCard);
+    };
+    var signOut = function () {
+        clearItemsFromCahce();
+        hideUserCard({ target: document.body, preventDefault: function () { return null; } });
+        userService.signOut();
+    };
+    userService.user.subscribe(updateUser);
+    window.addEventListener("scroll", resizeHeader);
+    openNavButton.addEventListener("click", openNav);
+    closeNavButton.addEventListener("click", closeNav);
+    signOutButton.addEventListener("click", signOut);
+    userNameOnly.addEventListener("click", showUserCard);
+});
+
+var HOST = "http://localhost:4001";
+var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
+var formToJson = function (form) {
+    var formData = new FormData(form);
+    var json = {};
+    formData["forEach"](function (data, key) {
+        json[key] = data;
+    });
+    return json;
+};
+var escapeHtml = function (content) {
+    if (typeof content === "string")
+        return content.replace(/</g, "&lt;");
+    return content;
+};
+var setItemToCache = function (prefix, item) { return localStorage.setItem(prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
+var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem(prefix.replace("/sticky", "") + "/" + id)); };
+
+var List = (function () {
+    function List(prefix) {
+        this.prefix = prefix;
+    }
+    List.prototype.getItems = function (page, offset, userId) {
+        var _this = this;
+        if (offset === void 0) { offset = 0; }
+        return this.listItems(page, offset).then(function (ids) {
+            var cachedItems = [];
+            var newIds = [];
+            ids.forEach(function (id) {
+                var cachedItem = getItemFromCache(_this.prefix, id);
+                if (cachedItem)
+                    cachedItems.push(cachedItem);
+                else
+                    newIds.push(id);
+            });
+            return _this.fetchItems(newIds, userId).then(function (newItems) {
+                newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
+                return cachedItems.concat(newItems);
+            });
+        });
+    };
+    List.prototype.listItems = function (page, offset) {
+        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset).then(function (res) { return res.json(); });
+    };
+    List.prototype.fetchItems = function (ids, userId) {
+        return fetch(HOST + this.prefix + "/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": userId
+            },
+            body: JSON.stringify(ids)
+        }).then(function (res) { return res.json(); });
+    };
+    return List;
+}());
 
 var replyPrefix = prefix + ("/" + id + "/replys");
 var replyList = new List(replyPrefix);

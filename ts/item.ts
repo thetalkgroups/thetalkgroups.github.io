@@ -1,3 +1,4 @@
+import "./common";
 import { HOST, getItemFromCache, setItemToCache, itemSinglar, formToJson, escapeHtml } from "./api-globals"
 import { List } from "./api-list"
 import { userService } from "./globals"

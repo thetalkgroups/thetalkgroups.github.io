@@ -71,7 +71,6 @@ button {
     
     width: 100%;
     margin-bottom: 16px;
-    will-change: auto;
     background-size: cover;
     background-repeat: no-repeat;
     will-change: auto;
@@ -86,6 +85,7 @@ button {
 .header__img {
     position: absolute;
     width: 100%;
+    left: 0;
 }
 .header__img.small {
     transition: opacity .3s;
@@ -148,9 +148,10 @@ button {
     background: transparent;
     text-transform: uppercase;
     position: fixed;
+    right: calc((100vw - 870px) / 2);
     top: 25px;
-    right: 128px;
     width: inherit;
+    z-index: 1;
 }
 .header__user {
     display: flex;
@@ -291,6 +292,9 @@ button {
     }
     .header__top-bar {
         right: 0;
+    }
+    .header__top-bar__sign-in-button {
+        right: 128px;
     }
 
     .navigation {

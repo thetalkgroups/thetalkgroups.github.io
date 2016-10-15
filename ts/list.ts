@@ -1,3 +1,4 @@
+import "./common";
 import { List } from "./api-list";
 import { itemSinglar } from "./api-globals";
 import { userService } from "./globals";

@@ -2,13 +2,14 @@
 layout: group
 group: thc
 head: >
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js" async defer></script>
-    <script>
-        const prefix = `/group${window.GROUP_URL}/questions`
-    </script>
-    <script src="/js/list.roll.js" async defer></script>
     <link rel="stylesheet" href="/css/list.css" async>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js" async defer></script>
 ---
+
+<script>
+    const prefix = "{{ site.data[page.group].baseUrl }}/questions";
+</script>
+<script src="/js/list.roll.js" async defer></script>
 
 <header class="list-header">
     <h2>Questions</h2>

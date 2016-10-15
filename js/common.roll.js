@@ -106,10 +106,10 @@ window.addEventListener("load", function () {
     var smallHeaderHeight = 72;
     var topElement = breadcrumb || wrapper;
     var topElementMargin = 16;
-    var resizeNav = function () {
+    var resizeHeader = function () {
         var headerHeight = document.body.getBoundingClientRect().right * headerImageHWRatio;
         var headerHiddenHeight = headerHeight - smallHeaderHeight;
-        var scrollTop = document.body.scrollTop;
+        var scrollTop = window.scrollY;
         if (scrollTop > headerHiddenHeight) {
             header.style.top = -headerHiddenHeight + "px";
             topElement.style.marginTop = headerHeight + topElementMargin + "px";
@@ -158,7 +158,7 @@ window.addEventListener("load", function () {
         userService.signOut();
     };
     userService.user.subscribe(updateUser);
-    document.addEventListener("scroll", resizeNav);
+    window.addEventListener("scroll", resizeHeader);
     openNavButton.addEventListener("click", openNav);
     closeNavButton.addEventListener("click", closeNav);
     signOutButton.addEventListener("click", signOut);
