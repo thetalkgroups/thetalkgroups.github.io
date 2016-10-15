@@ -7,13 +7,14 @@
     "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
     "typescript": "^2.0.3",
-    "typings": "^1.4.0"
+    "typings": "^1.4.0",
+    "concurrently": "^3.1.0"
   },
   "scripts": {
     "postinstall": "typings install",
     "build": "tsc && npm run roll",
-    "build:w": "tsc -w",
-    "roll:w": "rollup -m -w -o js/common.roll.js js/common.js && rollup -m -w -o js/sign-in.roll.js js/sign-in.js && rollup -m -w -o js/item.roll.js js/item.js && rollup -m -w -o js/list.roll.js js/list.js && rollup -m -w -o js/add-item.roll.js js/add-item.js",
+    "build:w": "tsc -w && npm run roll:w",
+    "roll:w": "concurrent 'rollup -m -w -o js/common.roll.js js/common.js' 'rollup -m -w -o js/sign-in.roll.js js/sign-in.js' 'rollup -m -w -o js/item.roll.js js/item.js' 'rollup -m -w -o js/list.roll.js js/list.js' 'rollup -m -w -o js/add-item.roll.js js/add-item.js'",
     "roll": "rollup -m -o js/common.roll.js js/common.js && rollup -m -o js/sign-in.roll.js js/sign-in.js && rollup -m -o js/item.roll.js js/item.js && rollup -m -o js/list.roll.js js/list.js && rollup -m -o js/add-item.roll.js js/add-item.js"
   },
   "author": "mathias hansen",
