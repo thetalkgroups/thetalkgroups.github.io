@@ -174,5 +174,7 @@ window.addEventListener("load", function () {
         userService.signIn(provider).then(function () { return history.back(); });
     };
     signInButtonGoogle.addEventListener("click", function () { return signIn("google"); });
+    signInButtonFacebook.addEventListener("click", function () { return signIn("facebook"); });
+    signInButtonTwitter.addEventListener("click", function () { return signIn("twitter"); });
 });
 //# sourceMappingURL=sign-in.roll.js.map

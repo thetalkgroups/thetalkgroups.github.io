@@ -12,6 +12,6 @@ window.addEventListener("load", () => {
     }
 
     signInButtonGoogle.addEventListener("click", () => signIn("google"));
-    //signInButtonFacebook.addEventListener("click", () => signIn("facebook"));
-    //signInButtonTwitter.addEventListener("click", () => signIn("twitter"));
+    signInButtonFacebook.addEventListener("click", () => signIn("facebook"));
+    signInButtonTwitter.addEventListener("click", () => signIn("twitter"));
 });

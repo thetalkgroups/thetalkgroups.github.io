@@ -190,7 +190,8 @@ var List = (function () {
     List.prototype.getItems = function (page, offset, userId) {
         var _this = this;
         if (offset === void 0) { offset = 0; }
-        return this.listItems(page, offset).then(function (ids) {
+        return this.listItems(page, offset).then(function (_a) {
+            var ids = _a.ids, numberOfPages = _a.numberOfPages;
             var cachedItems = [];
             var newIds = [];
             ids.forEach(function (id) {
@@ -202,7 +203,7 @@ var List = (function () {
             });
             return _this.fetchItems(newIds, userId).then(function (newItems) {
                 newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
-                return cachedItems.concat(newItems);
+                return { items: cachedItems.concat(newItems), numberOfPages: numberOfPages };
             });
         });
     };
@@ -221,6 +222,29 @@ var List = (function () {
     };
     return List;
 }());
+
+var initPagination = function (page, numberOfPages) {
+    var prev = document.querySelector(".pagination__prev");
+    var next = document.querySelector(".pagination__next");
+    var pageEl = document.querySelector(".pagination__page");
+    if (page !== 1) {
+        prev.href = getUrlWithPage(page - 1);
+    }
+    if (page < numberOfPages) {
+        next.href = getUrlWithPage(page + 1);
+    }
+    pageEl.innerHTML = page + " of " + numberOfPages;
+};
+var getUrlWithPage = function (page) {
+    var url = new URL(location.href);
+    if (!url.search.match("page=")) {
+        url.search += (url.search ? "&" : "") + "page=" + page;
+    }
+    else {
+        url.search = url.search.replace(/page=\d+/, "page=" + page);
+    }
+    return url.toString();
+};
 
 var replyPrefix = prefix + ("/" + id + "/replys");
 var replyList = new List(replyPrefix);
@@ -331,6 +355,8 @@ window.addEventListener("load", function () {
     var buttons = document.querySelector(".item__header__top__buttons");
     var deleteBtn = document.querySelector(".item__delete");
     var stickyButton = document.querySelector(".item__sticky");
+    var noReplys = document.querySelector(".replys__no-replys");
+    var pagination = document.querySelector(".pagination");
     var page = 1;
     var pageMatch = location.search.match(/page=(\d+)/);
     if (pageMatch)
@@ -366,11 +392,18 @@ window.addEventListener("load", function () {
         })
             .catch(function (error) { return console.error(error); });
         replyList.getItems(page, 0, userId)
-            .then(function (replys) {
-            if (replys.length === 0) {
-                replysEl.innerHTML = "<p>there are no replys yet</p>";
+            .then(function (_a) {
+            var items = _a.items, numberOfPages = _a.numberOfPages;
+            if (numberOfPages === 1) {
+                pagination.setAttribute("hidden", "");
             }
-            replys.map(function (reply) { return createReplyElement(reply, userId); })
+            else {
+                initPagination(page, numberOfPages);
+            }
+            if (items.length === 0) {
+                noReplys.removeAttribute("hidden");
+            }
+            items.map(function (reply) { return createReplyElement(reply, userId); })
                 .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
         })
             .catch(function (error) { return console.error(error); });

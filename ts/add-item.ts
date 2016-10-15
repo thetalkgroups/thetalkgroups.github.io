@@ -1,5 +1,5 @@
 import "./common";
-import { formToJson, HOST, escapeHtml, } from "./api-globals"
+import { formToJson, HOST } from "./api-globals"
 import { userService } from "./globals"
 import { Item } from "./types/item"
 
@@ -45,14 +45,14 @@ window.addEventListener("load", () => {
             const formData = formToJson(form) as { [key: string]: any }
             const otherFormData = Object.keys(formData).filter(k => k === "title")
                 .reduce((obj, k) => {
-                    obj[k] = escapeHtml(formData[k])
+                    obj[k] = formData[k]
                     return obj;
                 }, {} as { [key: string]: any})
 
             const data: Item = {
                 _id: undefined,
                 permission: undefined,
-                title: escapeHtml(formData["title"] as string), 
+                title: formData["title"] as string, 
                 user: { id: user.id, name: user.name, photo: user.photo },
                 content: otherFormData, 
                 fields: fields.map(field => field.name) 

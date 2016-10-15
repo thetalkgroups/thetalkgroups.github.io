@@ -11,12 +11,5 @@ export const formToJson = (form: HTMLFormElement): { [key: string]: any} => {
     return json;
 }
 
-export const escapeHtml = (content: any) => {
-    if (typeof content === "string")
-        return content.replace(/</g, "&lt;");
-
-    return content;
-}
-
 export const setItemToCache = (prefix: string, item: { _id: string }) => localStorage.setItem(prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item));
 export const getItemFromCache = (prefix: string, id: string) => JSON.parse(localStorage.getItem(prefix.replace("/sticky", "") + "/" + id));

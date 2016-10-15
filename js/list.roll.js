@@ -179,7 +179,8 @@ var List = (function () {
     List.prototype.getItems = function (page, offset, userId) {
         var _this = this;
         if (offset === void 0) { offset = 0; }
-        return this.listItems(page, offset).then(function (ids) {
+        return this.listItems(page, offset).then(function (_a) {
+            var ids = _a.ids, numberOfPages = _a.numberOfPages;
             var cachedItems = [];
             var newIds = [];
             ids.forEach(function (id) {
@@ -191,7 +192,7 @@ var List = (function () {
             });
             return _this.fetchItems(newIds, userId).then(function (newItems) {
                 newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
-                return cachedItems.concat(newItems);
+                return { items: cachedItems.concat(newItems), numberOfPages: numberOfPages };
             });
         });
     };
@@ -210,6 +211,29 @@ var List = (function () {
     };
     return List;
 }());
+
+var initPagination = function (page, numberOfPages) {
+    var prev = document.querySelector(".pagination__prev");
+    var next = document.querySelector(".pagination__next");
+    var pageEl = document.querySelector(".pagination__page");
+    if (page !== 1) {
+        prev.href = getUrlWithPage(page - 1);
+    }
+    if (page < numberOfPages) {
+        next.href = getUrlWithPage(page + 1);
+    }
+    pageEl.innerHTML = page + " of " + numberOfPages;
+};
+var getUrlWithPage = function (page) {
+    var url = new URL(location.href);
+    if (!url.search.match("page=")) {
+        url.search += (url.search ? "&" : "") + "page=" + page;
+    }
+    else {
+        url.search = url.search.replace(/page=\d+/, "page=" + page);
+    }
+    return url.toString();
+};
 
 var stickyList = new List(prefix + "/sticky");
 var normalList = new List(prefix);
@@ -245,9 +269,11 @@ window.addEventListener("load", function () {
     });
     stickyList.getItems(page)
         .then(function (stickyItems) {
-        stickyItems.map(createListItemElement).forEach(function (itemEl) { return stickyListEl.appendChild(itemEl); });
-        return normalList.getItems(page, stickyItems.length).then(function (normalItems) {
-            return normalItems.map(createListItemElement).forEach(function (itemEl) { return normalListEl.appendChild(itemEl); });
+        initPagination(page, stickyItems.numberOfPages);
+        stickyItems.items.map(createListItemElement).forEach(function (itemEl) { return stickyListEl.appendChild(itemEl); });
+        return normalList.getItems(page, stickyItems.items.length)
+            .then(function (normalItems) {
+            return normalItems.items.map(createListItemElement).forEach(function (itemEl) { return normalListEl.appendChild(itemEl); });
         });
     })
         .catch(function (error) { return console.error(error); });

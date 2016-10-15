@@ -150,7 +150,7 @@ button {
     position: fixed;
     right: calc((100vw - 870px) / 2);
     top: 25px;
-    width: inherit;
+    width: 70px;
     z-index: 1;
 }
 .header__user {
@@ -294,7 +294,7 @@ button {
         right: 0;
     }
     .header__top-bar__sign-in-button {
-        right: 128px;
+        right: 297px;
     }
 
     .navigation {
