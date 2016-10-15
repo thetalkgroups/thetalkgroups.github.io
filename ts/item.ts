@@ -1,5 +1,89 @@
+import { HOST, getItemFromCache, setItemToCache, itemSinglar, formToJson, escapeHtml } from "./api-globals"
+import { List } from "./api-list"
+import { userService } from "./globals"
+import { Item, Reply } from "./types/item"
+
 declare const id: string
-declare const api: Api
+declare const prefix: string
+
+const replyPrefix = prefix + `/${id}/replys`;
+const replyList = new List<Reply>(replyPrefix);
+
+const deleteItem = (id: string, userId: string, pre: string) => 
+    fetch(`${HOST}${pre}/${id}`, { 
+        method: "DELETE", 
+        headers: { "Authorization": userId } 
+    });
+
+const getItem = (userId: string) =>
+    Promise.resolve(getItemFromCache(prefix, id) as Item)
+        .then(item => {
+            if (item && item.content) return item;
+
+            return fetch(HOST+prefix+"/"+id, { 
+                headers: { "Authorization": userId } 
+            })
+                .then(res => res.json())
+                .then((item: Item) => {
+                    setItemToCache(prefix, item);
+
+                    return item;
+                });
+        });
+
+const setSticky = (userId: string, sticky: boolean = false) => {
+    localStorage.removeItem(`${prefix}/${id}`)
+
+    return fetch(`${HOST}${prefix}/${id}/sticky`, {
+        method: "POST",
+        body: JSON.stringify({ value: sticky }),
+        headers: {
+            "Content-Type": "application/json", 
+            "Authorization": userId 
+        }
+    })
+}
+
+const addReply = (data: any, onProgress: (percent: number | Error) => void) => {
+        const image = (data as any)["image"] as File;
+        let next = Promise.resolve();
+
+        if (image.size) {
+            const fd = new FormData();
+            const xhr = new XMLHttpRequest();
+
+            fd.append("image", image);
+
+            next = new Promise<void>((resolve, reject) => {
+                xhr.onload = () => {
+                    (data as any)["image"] = xhr.responseText;
+
+                    resolve();
+                };
+                xhr.onerror = reject;
+                xhr.onprogress = ({ lengthComputable, total, loaded }) => {
+                    if (!lengthComputable) return onProgress(new Error("length is not computeable"));
+
+                    onProgress(loaded / total);
+                };
+
+                xhr.open("POST", HOST + "/files", true);
+                xhr.send(fd);
+            })
+        }
+        else {
+            onProgress(new Error("no image was uploaded"));
+
+            delete (data as any)["image"]
+        }
+
+        return next.then(() => 
+            fetch(HOST + replyPrefix, {
+                method: "PUT",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" }
+            }))
+    }
 
 const createReplyElement = (reply: Reply, userId: string) => {
     const template = document.importNode((document.getElementById("reply") as HTMLTemplateElement).content, true);
@@ -22,19 +106,21 @@ const createReplyElement = (reply: Reply, userId: string) => {
 
     if (reply.image) {
         image.hidden = false;
-        image.src = api.getImageUrl(reply.image)
+        image.src = HOST + "/files/" + reply.image;
     }
 
     if (reply.permission === "you" || reply.permission === "admin") {
         deleteBtn.removeAttribute("hidden");
 
-        deleteBtn.onclick = _ => api.replys.delete(reply._id, userId)
+        deleteBtn.onclick = _ => deleteItem(reply._id, userId, replyPrefix)
             .then(_ => location.href = location.href)
             .catch(error => console.error(error));
     }
 
     return el;
 };
+
+
 
 window.addEventListener("load", () => {
     const replysEl = document.querySelector(".replys");
@@ -54,10 +140,10 @@ window.addEventListener("load", () => {
 
     if (pageMatch) page = parseInt(pageMatch[1], 10) || 1;
     
-    window.userService.user.subscribe(user => {
+    userService.user.subscribe(user => {
         const userId = user ? user.id : null;
 
-        api.items.getOne(id, userId)
+        getItem(userId)
             .then(item => {
                 itemPhoto.src = item.user.photo;
                 itemName.innerHTML = item.user.name;
@@ -68,7 +154,7 @@ window.addEventListener("load", () => {
                     buttons.removeAttribute("hidden");
 
                     deleteBtn.onclick = _ => confirm(`Are you sure you want do delete this ${itemSinglar}?`) 
-                        ? api.items.delete(id, userId)
+                        ? deleteItem(id, userId, prefix)
                             .then(_ => location.href = location.href.replace(/\w+\.html.*?$/, ""))
                             .catch(error => console.error(error)) 
                         : undefined;
@@ -79,7 +165,7 @@ window.addEventListener("load", () => {
                         stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
 
                         stickyButton.onclick = _ => confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar)) 
-                            ? api.setSticky(userId, item.sticky)
+                            ? setSticky(userId, item.sticky)
                                 .then(_ => location.href = location.href)
                                 .catch(error => console.error(error))
                             : undefined
@@ -93,7 +179,7 @@ window.addEventListener("load", () => {
             })
             .catch(error => console.error(error));
 
-        api.replys.getReplyList(page, userId)
+        replyList.getItems(page, 0, userId)
             .then(replys => {
                 if (replys.length === 0) {
                     replysEl.innerHTML = "<p>there are no replys yet</p>";
@@ -129,7 +215,7 @@ window.addEventListener("load", () => {
 
             data["user"] = user
 
-            api.replys.add(data, onProgress)
+            addReply(data, onProgress)
                 .then(() => location.href = location.href)
                 .catch(error => console.error(error));
 

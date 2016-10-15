@@ -1,26 +1,17 @@
+import { List } from "./api-list";
+import { itemSinglar } from "./api-globals";
+import { userService } from "./globals";
+import { Item } from "./types/item";
+
+declare const prefix: string
+
+const stickyList = new List<Item>(prefix + "/sticky");
+const normalList = new List<Item>(prefix);
+
 const pageMatch = location.search.match(/page=(\d+)/);
 let page = 1;
 
 if (pageMatch) page = parseInt(pageMatch[1], 10) || 1;
-const listNormal = document.querySelector(".list__normal");
-const listSticky = document.querySelector(".list__sticky");
-
-api.items.getItemList(page)
-    .then(items => {
-        items.sticky.map(createListItemElement).forEach(itemEl => listSticky.appendChild(itemEl));
-        items.normal.map(createListItemElement).forEach(itemEl => listNormal.appendChild(itemEl));
-    })
-    .then(_ => {
-        const questionListEl = document.querySelector(".list") as HTMLElement;
-        const askAQuestion = document.querySelector(".list-header__add-item") as HTMLElement
-        
-        window.userService.user.subscribe(user => {
-            if (!user) return;
-
-            askAQuestion.hidden = false;
-        })
-    })
-    .catch(error => console.error(error));
 
 const createListItemElement = (item: Item) => {
     const template = document.importNode((document.getElementById("list-item") as HTMLTemplateElement).content, true);
@@ -40,3 +31,29 @@ const createListItemElement = (item: Item) => {
 
     return el;
 }
+
+window.addEventListener("load", () => {
+    const normalListEl = document.querySelector(".list__normal");
+    const stickyListEl = document.querySelector(".list__sticky");
+    const askAQuestion = document.querySelector(".list-header__add-item") as HTMLElement
+
+    userService.user
+        .subscribe(user => {
+            if (!user) {
+                askAQuestion.hidden = true;
+
+                return;
+            }
+
+            askAQuestion.hidden = false;
+        });
+
+    stickyList.getItems(page)
+        .then(stickyItems => {
+            stickyItems.map(createListItemElement).forEach(itemEl => stickyListEl.appendChild(itemEl))
+
+            return normalList.getItems(page, stickyItems.length).then(normalItems =>
+                normalItems.map(createListItemElement).forEach(itemEl => normalListEl.appendChild(itemEl)))
+        })  
+        .catch(error => console.error(error));
+});
