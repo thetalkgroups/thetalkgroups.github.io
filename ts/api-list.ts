@@ -3,8 +3,8 @@ import { HOST, getItemFromCache, setItemToCache } from "./api-globals"
 export class List<a extends { _id: string }> {
     public constructor(private prefix: string) {}
 
-    public getItems(page: number, offset: number = 0, userId?: string): Promise<a[]> {
-        return this.listItems(page, offset).then(ids => {
+    public getItems(page: number, offset: number = 0, userId?: string): Promise<{ items: a[], numberOfPages: number }> {
+        return this.listItems(page, offset).then(({ ids, numberOfPages }) => {
             const cachedItems: a[] = [];
             const newIds: string[] = [];
 
@@ -20,12 +20,12 @@ export class List<a extends { _id: string }> {
             return this.fetchItems(newIds, userId).then(newItems => {
                 newItems.forEach(newItem => setItemToCache(this.prefix, newItem));
 
-                return cachedItems.concat(newItems);
+                return { items: cachedItems.concat(newItems), numberOfPages };
             })
         })
     }
 
-    private listItems(page: number, offset: number): Promise<string[]> {
+    private listItems(page: number, offset: number): Promise<{ ids: string[], numberOfPages: number }> {
         return fetch(HOST + this.prefix + "/list/" + page + "-" + offset).then(res => res.json());
     }
 

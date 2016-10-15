@@ -1,8 +1,9 @@
 import "./common";
-import { HOST, getItemFromCache, setItemToCache, itemSinglar, formToJson, escapeHtml } from "./api-globals"
+import { HOST, getItemFromCache, setItemToCache, itemSinglar, formToJson } from "./api-globals"
 import { List } from "./api-list"
 import { userService } from "./globals"
 import { Item, Reply } from "./types/item"
+import { initPagination } from "./pagination"
 
 declare const id: string
 declare const prefix: string
@@ -135,6 +136,8 @@ window.addEventListener("load", () => {
     const buttons = document.querySelector(".item__header__top__buttons");
     const deleteBtn = document.querySelector(".item__delete") as HTMLButtonElement;
     const stickyButton = document.querySelector(".item__sticky") as HTMLButtonElement;
+    const noReplys = document.querySelector(".replys__no-replys");
+    const pagination = document.querySelector(".pagination");
 
     let page = 1;
     const pageMatch = location.search.match(/page=(\d+)/);
@@ -181,12 +184,20 @@ window.addEventListener("load", () => {
             .catch(error => console.error(error));
 
         replyList.getItems(page, 0, userId)
-            .then(replys => {
-                if (replys.length === 0) {
-                    replysEl.innerHTML = "<p>there are no replys yet</p>";
+            .then(({ items, numberOfPages }) => {
+                if (numberOfPages === 1) {
+                    pagination.setAttribute("hidden", "");
+                }
+                else {
+                    initPagination(page, numberOfPages);
                 }
 
-                replys.map(reply => createReplyElement(reply, userId))
+
+                if (items.length === 0) {
+                    noReplys.removeAttribute("hidden");
+                }
+
+                items.map(reply => createReplyElement(reply, userId))
                     .forEach(replyEl => replysEl.appendChild(replyEl))
             })
             .catch(error => console.error(error));
@@ -212,7 +223,7 @@ window.addEventListener("load", () => {
             const data = formToJson(reply);
 
             Object.keys(data).filter(k => k !== "image")
-                .forEach(k => data[k] = escapeHtml(data[k]));
+                .forEach(k => data[k] = data[k]);
 
             data["user"] = user
 

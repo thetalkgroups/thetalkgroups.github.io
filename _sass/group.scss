@@ -23,6 +23,33 @@ img {
     max-width: 100%;
 }
 
+.pagination {
+    display: flex;
+    flex-direction: row;
+    border-top: 1px solid #E0E0E0;
+    padding: 16px 0;
+    justify-content: center;
+}
+
+.pagination__page {
+    font-size: 1em;
+    margin: 0 16px;
+}
+
+.pagination__prev, .pagination__next {
+    color: #9E9E9E;
+} 
+.pagination__prev:hover, .pagination__next:hover {
+    text-decoration: none;
+}
+
+.pagination__prev[href]:hover, .pagination__next[href]:hover {
+    text-decoration: underline;
+}
+.pagination__prev[href], .pagination__next[href] {
+    color: #616161;
+}
+
 @media (max-width: 870px) {
     .minor-header {
         padding: 0 16px;

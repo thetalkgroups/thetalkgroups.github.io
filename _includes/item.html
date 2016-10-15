@@ -31,10 +31,12 @@
     <p class="item__content"></p>
 </section>    
 
-<section class="replys"></section>
+<section class="replys">
+    <p class="replys__no-replys" hidden>there are no replys yet</p>
+</section>
 
 <section class="login-warning">
-    <p><a href="/sign-in.html">login</a> to reply</p>
+    <p><a href="/sign-in.html">sign in</a> to reply</p>
 </section>
 
 <form class="reply-form" hidden>
@@ -43,3 +45,5 @@
     <textarea id="answer" name="answer" placeholder="type your answer here..." required></textarea>
     <button type="submit">reply</button>
 </form>
+
+{% include pagination.html %}

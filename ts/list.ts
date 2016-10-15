@@ -3,6 +3,7 @@ import { List } from "./api-list";
 import { itemSinglar } from "./api-globals";
 import { userService } from "./globals";
 import { Item } from "./types/item";
+import { initPagination } from "./pagination";
 
 declare const prefix: string
 
@@ -51,10 +52,13 @@ window.addEventListener("load", () => {
 
     stickyList.getItems(page)
         .then(stickyItems => {
-            stickyItems.map(createListItemElement).forEach(itemEl => stickyListEl.appendChild(itemEl))
+            initPagination(page, stickyItems.numberOfPages);
 
-            return normalList.getItems(page, stickyItems.length).then(normalItems =>
-                normalItems.map(createListItemElement).forEach(itemEl => normalListEl.appendChild(itemEl)))
+            stickyItems.items.map(createListItemElement).forEach(itemEl => stickyListEl.appendChild(itemEl));
+
+            return normalList.getItems(page, stickyItems.items.length)
+                .then(normalItems =>
+                    normalItems.items.map(createListItemElement).forEach(itemEl => normalListEl.appendChild(itemEl)));
         })  
         .catch(error => console.error(error));
 });
