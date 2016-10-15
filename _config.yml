@@ -16,6 +16,9 @@ defaults:
     - values: 
         head: <script src="js/common.roll.js" async></script>
 
+sass:
+    style: compressed
+
 prose: 
     media: assets/content
     ignore: [
