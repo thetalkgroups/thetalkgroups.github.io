@@ -24,6 +24,8 @@ prose:
     ignore: [
         "_includes", 
         "_layouts", 
+        "_sass",
+        "_data",
         "assets/static", 
         "assets/user-content",
         "package.json",
@@ -39,5 +41,4 @@ prose:
         "*.html",
     ]
 
-# Build settings
 markdown: kramdown
