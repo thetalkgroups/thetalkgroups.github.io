@@ -7,8 +7,8 @@ import { initPagination } from "./pagination";
 
 declare const prefix: string
 
-const stickyList = new List<Item>(prefix + "/sticky");
 const normalList = new List<Item>(prefix);
+const stickyList = new List<Item>(prefix + "/sticky");
 
 const pageMatch = location.search.match(/page=(\d+)/);
 let page = 1;
@@ -38,6 +38,20 @@ window.addEventListener("load", () => {
     const normalListEl = document.querySelector(".list__normal");
     const stickyListEl = document.querySelector(".list__sticky");
     const askAQuestion = document.querySelector(".list-header__add-item") as HTMLElement
+    const spinner = document.querySelector(".spinner");
+    const list = document.querySelector(".list");
+    const pagination = document.querySelector(".pagination");
+    const errorEl = document.querySelector(".error");
+
+    const handleError = (error: any) => {
+        console.error(error);
+
+        errorEl.removeAttribute("hidden");
+
+        list.setAttribute("hidden", "");
+        pagination.setAttribute("hidden", "");
+        askAQuestion.setAttribute("hidden", "");
+    }
 
     userService.user
         .subscribe(user => {
@@ -50,15 +64,37 @@ window.addEventListener("load", () => {
             askAQuestion.hidden = false;
         });
 
-    stickyList.getItems(page)
-        .then(stickyItems => {
-            initPagination(page, stickyItems.numberOfPages);
 
-            stickyItems.items.map(createListItemElement).forEach(itemEl => stickyListEl.appendChild(itemEl));
+    const refreshList = (page: number) => {
+        const timeoutId = setTimeout(() => spinner.removeAttribute("hidden"), 100);
+        
+        stickyListEl.innerHTML = "";
+        normalListEl.innerHTML = "";
+        
+        return stickyList.getItems(page)
+            .then(stickyItems => {
+                stickyItems.items.map(createListItemElement).forEach(itemEl => stickyListEl.appendChild(itemEl));
 
-            return normalList.getItems(page, stickyItems.items.length)
-                .then(normalItems =>
-                    normalItems.items.map(createListItemElement).forEach(itemEl => normalListEl.appendChild(itemEl)));
-        })  
-        .catch(error => console.error(error));
+                return normalList.getItems(page, stickyItems.items.length)
+                    .then(normalItems => {
+                        clearTimeout(timeoutId);
+                        spinner.setAttribute("hidden", "");
+
+                        normalItems.items.map(createListItemElement).forEach(itemEl => normalListEl.appendChild(itemEl));
+
+                        return stickyItems.numberOfPages;
+                    });
+            });
+    } 
+    
+    refreshList(page)
+        .then((numberOfPages) => {
+            if (numberOfPages === 1 || numberOfPages === 0) {
+                pagination.setAttribute("hidden", "");
+            }
+            else {
+                initPagination(page, numberOfPages, refreshList)
+            }
+        })
+        .catch(handleError);
 });
