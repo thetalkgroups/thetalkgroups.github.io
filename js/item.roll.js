@@ -333,7 +333,7 @@ var createReplyElement = function (reply, userId) {
     if (reply.permission === "you" || reply.permission === "admin") {
         deleteBtn.removeAttribute("hidden");
         deleteBtn.onclick = function (_) { return deleteItem(reply._id, userId, replyPrefix)
-            .then(function (_) { return location.href = location.href; })
+            .then(function (_) { return history.go(); })
             .catch(function (error) { return console.error(error); }); };
     }
     return el;
@@ -347,6 +347,8 @@ window.addEventListener("load", function () {
     var itemContent = document.querySelector(".item__content");
     var loginWarning = document.querySelector(".login-warning");
     var reply = document.querySelector(".reply-form");
+    var uploadedImageEl = document.querySelector(".reply-form__uploaded-image");
+    var imageInput = document.getElementById("image");
     var buttons = document.querySelector(".item__header__top__buttons");
     var deleteBtn = document.querySelector(".item__delete");
     var stickyButton = document.querySelector(".item__sticky");
@@ -356,6 +358,16 @@ window.addEventListener("load", function () {
     var pageMatch = location.search.match(/page=(\d+)/);
     if (pageMatch)
         page = parseInt(pageMatch[1], 10) || 1;
+    imageInput.addEventListener("change", function () {
+        var fr = new FileReader();
+        var uploadedImage = imageInput.files[0];
+        fr.onload = function (event) {
+            uploadedImageEl.src = event.target.result;
+            uploadedImageEl.removeAttribute("hidden");
+            uploadedImageEl.nextElementSibling.setAttribute("hidden", "");
+        };
+        fr.readAsDataURL(uploadedImage);
+    });
     userService.user.subscribe(function (user) {
         var userId = user ? user.id : null;
         getItem(userId)
@@ -376,7 +388,7 @@ window.addEventListener("load", function () {
                     stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
                     stickyButton.onclick = function (_) { return confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar))
                         ? setSticky(userId, item.sticky)
-                            .then(function (_) { return location.href = location.href; })
+                            .then(function (_) { return history.go(); })
                             .catch(function (error) { return console.error(error); })
                         : undefined; };
                 }
@@ -414,13 +426,11 @@ window.addEventListener("load", function () {
             console.log(progress);
         };
         reply.onsubmit = function (event) {
-            event.preventDefault();
             var data = formToJson(reply);
-            Object.keys(data).filter(function (k) { return k !== "image"; })
-                .forEach(function (k) { return data[k] = data[k]; });
+            event.preventDefault();
             data["user"] = user;
             addReply(data, onProgress)
-                .then(function () { return location.href = location.href; })
+                .then(function () { return history.go(); })
                 .catch(function (error) { return console.error(error); });
             return false;
         };

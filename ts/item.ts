@@ -45,7 +45,6 @@ const setSticky = (userId: string, sticky: boolean = false) => {
         }
     })
 }
-
 const addReply = (data: any, onProgress: (percent: number | Error) => void) => {
         const image = (data as any)["image"] as File;
         let next = Promise.resolve();
@@ -115,14 +114,12 @@ const createReplyElement = (reply: Reply, userId: string) => {
         deleteBtn.removeAttribute("hidden");
 
         deleteBtn.onclick = _ => deleteItem(reply._id, userId, replyPrefix)
-            .then(_ => location.href = location.href)
+            .then(_ => history.go())
             .catch(error => console.error(error));
     }
 
     return el;
 };
-
-
 
 window.addEventListener("load", () => {
     const replysEl = document.querySelector(".replys");
@@ -133,6 +130,8 @@ window.addEventListener("load", () => {
     const itemContent = document.querySelector(".item__content");
     const loginWarning = document.querySelector(".login-warning");
     const reply = document.querySelector(".reply-form") as HTMLFormElement;
+    const uploadedImageEl = document.querySelector(".reply-form__uploaded-image") as HTMLImageElement;
+    const imageInput = document.getElementById("image") as HTMLInputElement
     const buttons = document.querySelector(".item__header__top__buttons");
     const deleteBtn = document.querySelector(".item__delete") as HTMLButtonElement;
     const stickyButton = document.querySelector(".item__sticky") as HTMLButtonElement;
@@ -144,6 +143,19 @@ window.addEventListener("load", () => {
 
     if (pageMatch) page = parseInt(pageMatch[1], 10) || 1;
     
+    imageInput.addEventListener("change", () => {
+        const fr = new FileReader();
+        const uploadedImage = imageInput.files[0];
+
+        fr.onload = event => {
+            uploadedImageEl.src = (event.target as any).result;
+            uploadedImageEl.removeAttribute("hidden");
+            uploadedImageEl.nextElementSibling.setAttribute("hidden", "");
+        }
+
+        fr.readAsDataURL(uploadedImage);
+    })
+
     userService.user.subscribe(user => {
         const userId = user ? user.id : null;
 
@@ -170,7 +182,7 @@ window.addEventListener("load", () => {
 
                         stickyButton.onclick = _ => confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar)) 
                             ? setSticky(userId, item.sticky)
-                                .then(_ => location.href = location.href)
+                                .then(_ => history.go())
                                 .catch(error => console.error(error))
                             : undefined
                     }
@@ -217,18 +229,17 @@ window.addEventListener("load", () => {
             console.log(progress);
         }
 
-        reply.onsubmit = event => {
-            event.preventDefault();
 
+
+        reply.onsubmit = event => {
             const data = formToJson(reply);
 
-            Object.keys(data).filter(k => k !== "image")
-                .forEach(k => data[k] = data[k]);
+            event.preventDefault();
 
             data["user"] = user
 
             addReply(data, onProgress)
-                .then(() => location.href = location.href)
+                .then(() => history.go())
                 .catch(error => console.error(error));
 
             return false;

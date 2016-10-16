@@ -40,7 +40,10 @@
 </section>
 
 <form class="reply-form" hidden>
-    <label for="image"><img src="/assets/static/ic_camera_alt_black_24px.svg" alt="upload photo"></label>
+    <label for="image">
+        <img class="reply-form__uploaded-image" alt="uploaded image" hidden>
+        <img src="/assets/static/ic_camera_alt_black_24px.svg" alt="upload photo">
+    </label>
     <input id="image" name="image" type="file" accept="image/*" hidden>
     <textarea id="answer" name="answer" placeholder="type your answer here..." required></textarea>
     <button type="submit">reply</button>
