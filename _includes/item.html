@@ -13,6 +13,8 @@
     </section>
 </template>
 
+{% include error-message.html %}
+
 <section class="item__header">
     <header class="item__header__top">
         <section class="item__header__top__content">
@@ -28,11 +30,13 @@
         </section>
     </header>
     <h2 class="item__title"></h2>
+    <img class="item__spinner spinner" src="/assets/static/spinner.png" alt="spinner" hidden>
     <p class="item__content"></p>
 </section>    
 
+<img class="replys__spinner spinner" src="/assets/static/spinner.png" alt="spinner" hidden>
+<p class="replys__no-replys" hidden>there are no replys yet</p>
 <section class="replys">
-    <p class="replys__no-replys" hidden>there are no replys yet</p>
 </section>
 
 <section class="login-warning">

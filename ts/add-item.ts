@@ -18,8 +18,18 @@ window.addEventListener("load", () => {
     const loginWarning = document.querySelector(".login-warning") as HTMLElement;
     const form = document.querySelector(".add-item") as HTMLFormElement;
     const fieldsEl = form.querySelector(".fields");
+    const errorEl = document.querySelector(".error");
 
-    
+
+    const handleError = (error: any) => {
+        console.error(error);
+
+        errorEl.removeAttribute("hidden");
+
+        loginWarning.setAttribute("hidden", "");
+        form.setAttribute("hidden", "");
+    } 
+
     fields.forEach(field => {
         const label = document.createElement("label") as HTMLLabelElement;
         const input = document.createElement(field.type) as HTMLInputElement;
@@ -36,7 +46,15 @@ window.addEventListener("load", () => {
     })
 
     userService.user.subscribe(user => {
-        if (!user) return;
+        if (!user) {
+            form.setAttribute("hidden", "");
+            loginWarning.removeAttribute("hidden");
+
+            return;
+        }
+
+        form.removeAttribute("hidden");
+        loginWarning.setAttribute("hidden", "");
 
         const onAddItem = (event: Event) => {
             event.preventDefault();
@@ -64,8 +82,7 @@ window.addEventListener("load", () => {
             return false;
         };
 
-        form.hidden = false;
-        loginWarning.hidden = true;
+        
 
         form.addEventListener("submit", onAddItem);
     });

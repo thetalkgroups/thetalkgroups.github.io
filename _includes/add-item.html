@@ -1,8 +1,10 @@
-<section class="login-warning">
+{% include error-message.html %}
+
+<section class="login-warning" hidden>
     <p>you must be logged in to use this feature</p>
 </section>
 
-<form class="add-item" method="PUT" hidden>
+<form class="add-item" method="PUT">
     <label for="title">title</label>
     <input id="title" name="title" type="text" required/>
 
