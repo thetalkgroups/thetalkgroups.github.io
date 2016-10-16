@@ -201,8 +201,6 @@ window.addEventListener("load", function () {
     userService.user.subscribe(function (user) {
         if (!user)
             return;
-        form.hidden = false;
-        loginWarning.hidden = true;
         var onAddItem = function (event) {
             event.preventDefault();
             var formData = formToJson(form);
@@ -224,6 +222,8 @@ window.addEventListener("load", function () {
                 .catch(function (error) { return console.error(error); });
             return false;
         };
+        form.hidden = false;
+        loginWarning.hidden = true;
         form.addEventListener("submit", onAddItem);
     });
 });

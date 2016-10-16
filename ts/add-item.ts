@@ -2,6 +2,7 @@ import "./common";
 import { formToJson, HOST } from "./api-globals"
 import { userService } from "./globals"
 import { Item } from "./types/item"
+import { User } from "./types/user"
 
 declare const fields: { name: string, type: string, required: boolean }[]
 declare const prefix: string
@@ -18,6 +19,7 @@ window.addEventListener("load", () => {
     const form = document.querySelector(".add-item") as HTMLFormElement;
     const fieldsEl = form.querySelector(".fields");
 
+    
     fields.forEach(field => {
         const label = document.createElement("label") as HTMLLabelElement;
         const input = document.createElement(field.type) as HTMLInputElement;
@@ -35,9 +37,6 @@ window.addEventListener("load", () => {
 
     userService.user.subscribe(user => {
         if (!user) return;
-
-        form.hidden = false;
-        loginWarning.hidden = true;
 
         const onAddItem = (event: Event) => {
             event.preventDefault();
@@ -64,6 +63,9 @@ window.addEventListener("load", () => {
 
             return false;
         };
+
+        form.hidden = false;
+        loginWarning.hidden = true;
 
         form.addEventListener("submit", onAddItem);
     });
