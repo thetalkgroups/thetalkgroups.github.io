@@ -7,15 +7,7 @@ head: >
 ---
 
 <script>
-    const idMatch = location.search.match(/id=(\w+)/);
-
-    if (!idMatch) {
-        console.error("id missing");
-    }
-    else {
-        id = idMatch[1];
-        prefix = "{{ site.data[page.group].baseUrl }}/questions";
-    }
+    const prefix = "{{ site.data[page.group].baseUrl }}/questions";
 </script>
 <script src="/js/item.roll.js" async defer></script>
 

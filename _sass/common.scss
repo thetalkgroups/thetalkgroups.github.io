@@ -295,6 +295,12 @@ button {
     }
     .header__top-bar__sign-in-button {
         right: 297px;
+        transition: .3s right;
+    }
+
+    .navigation.open .header__top-bar__sign-in-button {
+        z-index: 0;
+        right: 51px;
     }
 
     .navigation {

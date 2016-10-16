@@ -14,7 +14,7 @@ exclude: [
 
 defaults: 
     - values: 
-        head: <script src="js/common.roll.js" async></script>
+        head: <script src="js/common.roll.js" async defer></script>
 
 sass:
     style: compressed

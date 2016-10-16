@@ -17,6 +17,8 @@ export class List<a extends { _id: string }> {
                     newIds.push(id);
             })
 
+            if (newIds.length === 0) return { items: cachedItems, numberOfPages };
+
             return this.fetchItems(newIds, userId).then(newItems => {
                 newItems.forEach(newItem => setItemToCache(this.prefix, newItem));
 

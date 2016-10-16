@@ -187,6 +187,13 @@ window.addEventListener("load", function () {
     var loginWarning = document.querySelector(".login-warning");
     var form = document.querySelector(".add-item");
     var fieldsEl = form.querySelector(".fields");
+    var errorEl = document.querySelector(".error");
+    var handleError = function (error) {
+        console.error(error);
+        errorEl.removeAttribute("hidden");
+        loginWarning.setAttribute("hidden", "");
+        form.setAttribute("hidden", "");
+    };
     fields.forEach(function (field) {
         var label = document.createElement("label");
         var input = document.createElement(field.type);
@@ -199,8 +206,13 @@ window.addEventListener("load", function () {
         fieldsEl.appendChild(input);
     });
     userService.user.subscribe(function (user) {
-        if (!user)
+        if (!user) {
+            form.setAttribute("hidden", "");
+            loginWarning.removeAttribute("hidden");
             return;
+        }
+        form.removeAttribute("hidden");
+        loginWarning.setAttribute("hidden", "");
         var onAddItem = function (event) {
             event.preventDefault();
             var formData = formToJson(form);
@@ -222,8 +234,6 @@ window.addEventListener("load", function () {
                 .catch(function (error) { return console.error(error); });
             return false;
         };
-        form.hidden = false;
-        loginWarning.hidden = true;
         form.addEventListener("submit", onAddItem);
     });
 });

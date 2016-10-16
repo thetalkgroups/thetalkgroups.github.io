@@ -189,6 +189,8 @@ var List = (function () {
                 else
                     newIds.push(id);
             });
+            if (newIds.length === 0)
+                return { items: cachedItems, numberOfPages: numberOfPages };
             return _this.fetchItems(newIds, userId).then(function (newItems) {
                 newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
                 return { items: cachedItems.concat(newItems), numberOfPages: numberOfPages };
@@ -211,21 +213,44 @@ var List = (function () {
     return List;
 }());
 
-var initPagination = function (page, numberOfPages) {
+var initPagination = function (page, numberOfPages, refreshList) {
     var prev = document.querySelector(".pagination__prev");
     var next = document.querySelector(".pagination__next");
     var pageEl = document.querySelector(".pagination__page");
-    if (page !== 1) {
-        prev.href = getUrlWithPage(page - 1);
-    }
-    if (page < numberOfPages) {
-        next.href = getUrlWithPage(page + 1);
-    }
-    pageEl.innerHTML = page + " of " + numberOfPages;
+    var updatePage = function () {
+        if (page === 1)
+            prev.classList.add("disabled");
+        else
+            prev.classList.remove("disabled");
+        if (page === numberOfPages)
+            next.classList.add("disabled");
+        else
+            next.classList.remove("disabled");
+        history.pushState(null, null, getUrlWithPage(page));
+        pageEl.innerHTML = page + " of " + numberOfPages;
+    };
+    prev.onclick = function () {
+        if (prev.classList.contains("disabled"))
+            return;
+        page -= 1;
+        updatePage();
+        refreshList(page);
+    };
+    next.onclick = function () {
+        if (next.classList.contains("disabled"))
+            return;
+        page += 1;
+        updatePage();
+        refreshList(page);
+    };
+    updatePage();
 };
 var getUrlWithPage = function (page) {
     var url = new URL(location.href);
-    if (!url.search.match("page=")) {
+    if (page === 1) {
+        url.search = url.search.replace(/&?page=\d+/, "");
+    }
+    else if (!url.search.match("page=")) {
         url.search += (url.search ? "&" : "") + "page=" + page;
     }
     else {
@@ -234,8 +259,8 @@ var getUrlWithPage = function (page) {
     return url.toString();
 };
 
-var stickyList = new List(prefix + "/sticky");
 var normalList = new List(prefix);
+var stickyList = new List(prefix + "/sticky");
 var pageMatch = location.search.match(/page=(\d+)/);
 var page = 1;
 if (pageMatch)
@@ -258,6 +283,17 @@ window.addEventListener("load", function () {
     var normalListEl = document.querySelector(".list__normal");
     var stickyListEl = document.querySelector(".list__sticky");
     var askAQuestion = document.querySelector(".list-header__add-item");
+    var spinner = document.querySelector(".spinner");
+    var list = document.querySelector(".list");
+    var pagination = document.querySelector(".pagination");
+    var errorEl = document.querySelector(".error");
+    var handleError = function (error) {
+        console.error(error);
+        errorEl.removeAttribute("hidden");
+        list.setAttribute("hidden", "");
+        pagination.setAttribute("hidden", "");
+        askAQuestion.setAttribute("hidden", "");
+    };
     userService.user
         .subscribe(function (user) {
         if (!user) {
@@ -266,15 +302,31 @@ window.addEventListener("load", function () {
         }
         askAQuestion.hidden = false;
     });
-    stickyList.getItems(page)
-        .then(function (stickyItems) {
-        initPagination(page, stickyItems.numberOfPages);
-        stickyItems.items.map(createListItemElement).forEach(function (itemEl) { return stickyListEl.appendChild(itemEl); });
-        return normalList.getItems(page, stickyItems.items.length)
-            .then(function (normalItems) {
-            return normalItems.items.map(createListItemElement).forEach(function (itemEl) { return normalListEl.appendChild(itemEl); });
+    var refreshList = function (page) {
+        var timeoutId = setTimeout(function () { return spinner.removeAttribute("hidden"); }, 100);
+        stickyListEl.innerHTML = "";
+        normalListEl.innerHTML = "";
+        return stickyList.getItems(page)
+            .then(function (stickyItems) {
+            stickyItems.items.map(createListItemElement).forEach(function (itemEl) { return stickyListEl.appendChild(itemEl); });
+            return normalList.getItems(page, stickyItems.items.length)
+                .then(function (normalItems) {
+                clearTimeout(timeoutId);
+                spinner.setAttribute("hidden", "");
+                normalItems.items.map(createListItemElement).forEach(function (itemEl) { return normalListEl.appendChild(itemEl); });
+                return stickyItems.numberOfPages;
+            });
         });
+    };
+    refreshList(page)
+        .then(function (numberOfPages) {
+        if (numberOfPages === 1 || numberOfPages === 0) {
+            pagination.setAttribute("hidden", "");
+        }
+        else {
+            initPagination(page, numberOfPages, refreshList);
+        }
     })
-        .catch(function (error) { return console.error(error); });
+        .catch(handleError);
 });
 //# sourceMappingURL=list.roll.js.map

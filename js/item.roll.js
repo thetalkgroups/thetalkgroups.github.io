@@ -196,6 +196,8 @@ var List = (function () {
                 else
                     newIds.push(id);
             });
+            if (newIds.length === 0)
+                return { items: cachedItems, numberOfPages: numberOfPages };
             return _this.fetchItems(newIds, userId).then(function (newItems) {
                 newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
                 return { items: cachedItems.concat(newItems), numberOfPages: numberOfPages };
@@ -218,21 +220,44 @@ var List = (function () {
     return List;
 }());
 
-var initPagination = function (page, numberOfPages) {
+var initPagination = function (page, numberOfPages, refreshList) {
     var prev = document.querySelector(".pagination__prev");
     var next = document.querySelector(".pagination__next");
     var pageEl = document.querySelector(".pagination__page");
-    if (page !== 1) {
-        prev.href = getUrlWithPage(page - 1);
-    }
-    if (page < numberOfPages) {
-        next.href = getUrlWithPage(page + 1);
-    }
-    pageEl.innerHTML = page + " of " + numberOfPages;
+    var updatePage = function () {
+        if (page === 1)
+            prev.classList.add("disabled");
+        else
+            prev.classList.remove("disabled");
+        if (page === numberOfPages)
+            next.classList.add("disabled");
+        else
+            next.classList.remove("disabled");
+        history.pushState(null, null, getUrlWithPage(page));
+        pageEl.innerHTML = page + " of " + numberOfPages;
+    };
+    prev.onclick = function () {
+        if (prev.classList.contains("disabled"))
+            return;
+        page -= 1;
+        updatePage();
+        refreshList(page);
+    };
+    next.onclick = function () {
+        if (next.classList.contains("disabled"))
+            return;
+        page += 1;
+        updatePage();
+        refreshList(page);
+    };
+    updatePage();
 };
 var getUrlWithPage = function (page) {
     var url = new URL(location.href);
-    if (!url.search.match("page=")) {
+    if (page === 1) {
+        url.search = url.search.replace(/&?page=\d+/, "");
+    }
+    else if (!url.search.match("page=")) {
         url.search += (url.search ? "&" : "") + "page=" + page;
     }
     else {
@@ -241,110 +266,15 @@ var getUrlWithPage = function (page) {
     return url.toString();
 };
 
-var replyPrefix = prefix + ("/" + id + "/replys");
-var replyList = new List(replyPrefix);
-var deleteItem = function (id, userId, pre) {
-    return fetch("" + HOST + pre + "/" + id, {
-        method: "DELETE",
-        headers: { "Authorization": userId }
-    });
-};
-var getItem = function (userId) {
-    return Promise.resolve(getItemFromCache(prefix, id))
-        .then(function (item) {
-        if (item && item.content)
-            return item;
-        return fetch(HOST + prefix + "/" + id, {
-            headers: { "Authorization": userId }
-        })
-            .then(function (res) { return res.json(); })
-            .then(function (item) {
-            setItemToCache(prefix, item);
-            return item;
-        });
-    });
-};
-var setSticky = function (userId, sticky) {
-    if (sticky === void 0) { sticky = false; }
-    localStorage.removeItem(prefix + "/" + id);
-    return fetch("" + HOST + prefix + "/" + id + "/sticky", {
-        method: "POST",
-        body: JSON.stringify({ value: sticky }),
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": userId
-        }
-    });
-};
-var addReply = function (data, onProgress) {
-    var image = data["image"];
-    var next = Promise.resolve();
-    if (image.size) {
-        var fd_1 = new FormData();
-        var xhr_1 = new XMLHttpRequest();
-        fd_1.append("image", image);
-        next = new Promise(function (resolve, reject) {
-            xhr_1.onload = function () {
-                data["image"] = xhr_1.responseText;
-                resolve();
-            };
-            xhr_1.onerror = reject;
-            xhr_1.onprogress = function (_a) {
-                var lengthComputable = _a.lengthComputable, total = _a.total, loaded = _a.loaded;
-                if (!lengthComputable)
-                    return onProgress(new Error("length is not computeable"));
-                onProgress(loaded / total);
-            };
-            xhr_1.open("POST", HOST + "/files", true);
-            xhr_1.send(fd_1);
-        });
-    }
-    else {
-        onProgress(new Error("no image was uploaded"));
-        delete data["image"];
-    }
-    return next.then(function () {
-        return fetch(HOST + replyPrefix, {
-            method: "PUT",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "application/json" }
-        });
-    });
-};
-var createReplyElement = function (reply, userId) {
-    var template = document.importNode(document.getElementById("reply").content, true);
-    var el = document.createElement("article");
-    el.appendChild(template);
-    var photo = el.querySelector(".reply__photo");
-    var name = el.querySelector(".reply__name");
-    var date = el.querySelector(".reply__date");
-    var answer = el.querySelector(".reply__answer");
-    var image = el.querySelector(".reply__image");
-    var deleteBtn = el.querySelector(".reply__delete");
-    el.className = "reply";
-    photo.src = reply.user.photo;
-    name.innerHTML = reply.user.name;
-    date.innerHTML = moment(reply.date).fromNow();
-    answer.innerHTML = reply.answer;
-    if (reply.image) {
-        image.hidden = false;
-        image.src = HOST + "/files/" + reply.image;
-    }
-    if (reply.permission === "you" || reply.permission === "admin") {
-        deleteBtn.removeAttribute("hidden");
-        deleteBtn.onclick = function (_) { return deleteItem(reply._id, userId, replyPrefix)
-            .then(function (_) { return history.go(); })
-            .catch(function (error) { return console.error(error); }); };
-    }
-    return el;
-};
 window.addEventListener("load", function () {
     var replysEl = document.querySelector(".replys");
+    var itemHeader = document.querySelector(".item__header");
     var itemPhoto = document.querySelector(".item__photo");
     var itemName = document.querySelector(".item__name");
     var itemDate = document.querySelector(".item__date");
     var itemTitle = document.querySelector(".item__title");
     var itemContent = document.querySelector(".item__content");
+    var itemSpinner = document.querySelector(".item__spinner");
     var loginWarning = document.querySelector(".login-warning");
     var reply = document.querySelector(".reply-form");
     var uploadedImageEl = document.querySelector(".reply-form__uploaded-image");
@@ -354,10 +284,122 @@ window.addEventListener("load", function () {
     var stickyButton = document.querySelector(".item__sticky");
     var noReplys = document.querySelector(".replys__no-replys");
     var pagination = document.querySelector(".pagination");
+    var replysSpinner = document.querySelector(".replys__spinner");
+    var errorEl = document.querySelector(".error");
+    var handleError = function (error) {
+        console.error(error);
+        errorEl.removeAttribute("hidden");
+        clearTimeout(replySpinnerTimeoutId);
+        itemHeader.setAttribute("hidden", "");
+        replysSpinner.setAttribute("hidden", "");
+        reply.setAttribute("hidden", "");
+        replysEl.setAttribute("hidden", "");
+        pagination.setAttribute("hidden", "");
+        loginWarning.setAttribute("hidden", "");
+    };
+    var idMatch = location.search.match(/id=(\w+)/);
+    var id;
+    if (!idMatch) {
+        return handleError(new Error("id missing"));
+    }
+    else {
+        id = idMatch[1];
+    }
+    var replyPrefix = prefix + ("/" + id + "/replys");
+    var replyList = new List(replyPrefix);
+    var deleteItem = function (id, userId, pre) {
+        return fetch("" + HOST + pre + "/" + id, {
+            method: "DELETE",
+            headers: { "Authorization": userId }
+        });
+    };
+    var getItem = function (userId) {
+        return Promise.resolve(getItemFromCache(prefix, id))
+            .then(function (item) {
+            if (item && item.content)
+                return item;
+            return fetch(HOST + prefix + "/" + id, {
+                headers: { "Authorization": userId }
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (item) {
+                setItemToCache(prefix, item);
+                return item;
+            });
+        });
+    };
+    var setSticky = function (userId, sticky) {
+        if (sticky === void 0) { sticky = false; }
+        localStorage.removeItem(prefix + "/" + id);
+        return fetch("" + HOST + prefix + "/" + id + "/sticky", {
+            method: "POST",
+            body: JSON.stringify({ value: sticky }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": userId
+            }
+        });
+    };
+    var addReply = function (data) {
+        var image = data["image"];
+        var next = Promise.resolve();
+        if (image.size) {
+            var fd_1 = new FormData();
+            var xhr_1 = new XMLHttpRequest();
+            fd_1.append("image", image);
+            next = new Promise(function (resolve, reject) {
+                xhr_1.onload = function () {
+                    data["image"] = xhr_1.responseText;
+                    resolve();
+                };
+                xhr_1.onerror = reject;
+                xhr_1.open("POST", HOST + "/files", true);
+                xhr_1.send(fd_1);
+            });
+        }
+        else {
+            delete data["image"];
+        }
+        return next.then(function () {
+            return fetch(HOST + replyPrefix, {
+                method: "PUT",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" }
+            });
+        });
+    };
+    var createReplyElement = function (reply, userId) {
+        var template = document.importNode(document.getElementById("reply").content, true);
+        var el = document.createElement("article");
+        el.appendChild(template);
+        var photo = el.querySelector(".reply__photo");
+        var name = el.querySelector(".reply__name");
+        var date = el.querySelector(".reply__date");
+        var answer = el.querySelector(".reply__answer");
+        var image = el.querySelector(".reply__image");
+        var deleteBtn = el.querySelector(".reply__delete");
+        el.className = "reply";
+        photo.src = reply.user.photo;
+        name.innerHTML = reply.user.name;
+        date.innerHTML = moment(reply.date).fromNow();
+        answer.innerHTML = reply.answer;
+        if (reply.image) {
+            image.hidden = false;
+            image.src = HOST + "/files/" + reply.image;
+        }
+        if (reply.permission === "you" || reply.permission === "admin") {
+            deleteBtn.removeAttribute("hidden");
+            deleteBtn.onclick = function (_) { return deleteItem(reply._id, userId, replyPrefix)
+                .then(function (_) { return history.go(); })
+                .catch(handleError); };
+        }
+        return el;
+    };
     var page = 1;
     var pageMatch = location.search.match(/page=(\d+)/);
     if (pageMatch)
         page = parseInt(pageMatch[1], 10) || 1;
+    var replySpinnerTimeoutId = -1;
     imageInput.addEventListener("change", function () {
         var fr = new FileReader();
         var uploadedImage = imageInput.files[0];
@@ -368,10 +410,26 @@ window.addEventListener("load", function () {
         };
         fr.readAsDataURL(uploadedImage);
     });
+    var itemSpinnerTimeoutId = setTimeout(function () { return itemSpinner.removeAttribute("hidden"); }, 100);
     userService.user.subscribe(function (user) {
         var userId = user ? user.id : null;
+        var listReplys = function (page) {
+            replySpinnerTimeoutId = setTimeout(function () { return replysSpinner.removeAttribute("hidden"); }, 100);
+            replysEl.innerHTML = "";
+            return replyList.getItems(page, 0, userId)
+                .then(function (value) {
+                clearTimeout(replySpinnerTimeoutId);
+                replysSpinner.setAttribute("hidden", "");
+                var items = value.items, numberOfPages = value.numberOfPages;
+                items.map(function (reply) { return createReplyElement(reply, userId); })
+                    .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
+                return value;
+            });
+        };
         getItem(userId)
             .then(function (item) {
+            clearTimeout(itemSpinnerTimeoutId);
+            itemSpinner.setAttribute("hidden", "");
             itemPhoto.src = item.user.photo;
             itemName.innerHTML = item.user.name;
             itemDate.innerHTML = moment(item.date).fromNow();
@@ -381,7 +439,7 @@ window.addEventListener("load", function () {
                 deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSinglar + "?")
                     ? deleteItem(id, userId, prefix)
                         .then(function (_) { return location.href = location.href.replace(/\w+\.html.*?$/, ""); })
-                        .catch(function (error) { return console.error(error); })
+                        .catch(handleError)
                     : undefined; };
                 if (item.permission === "admin") {
                     stickyButton.removeAttribute("hidden");
@@ -389,7 +447,7 @@ window.addEventListener("load", function () {
                     stickyButton.onclick = function (_) { return confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar))
                         ? setSticky(userId, item.sticky)
                             .then(function (_) { return history.go(); })
-                            .catch(function (error) { return console.error(error); })
+                            .catch(handleError)
                         : undefined; };
                 }
             }
@@ -397,23 +455,21 @@ window.addEventListener("load", function () {
                 .reduce(function (content, k) { return content + ("<div class=\"" + k + "\">" + item.content[k] + "</div>"); });
             itemContent.innerHTML = content;
         })
-            .catch(function (error) { return console.error(error); });
-        replyList.getItems(page, 0, userId)
+            .catch(handleError);
+        listReplys(page)
             .then(function (_a) {
             var items = _a.items, numberOfPages = _a.numberOfPages;
-            if (numberOfPages === 1) {
+            if (numberOfPages === 1 || numberOfPages === 0) {
                 pagination.setAttribute("hidden", "");
             }
             else {
-                initPagination(page, numberOfPages);
+                initPagination(page, numberOfPages, listReplys);
             }
             if (items.length === 0) {
                 noReplys.removeAttribute("hidden");
             }
-            items.map(function (reply) { return createReplyElement(reply, userId); })
-                .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
         })
-            .catch(function (error) { return console.error(error); });
+            .catch(handleError);
         if (!user) {
             loginWarning.removeAttribute("hidden");
             reply.setAttribute("hidden", "");
@@ -422,16 +478,13 @@ window.addEventListener("load", function () {
         }
         loginWarning.setAttribute("hidden", "");
         reply.removeAttribute("hidden");
-        var onProgress = function (progress) {
-            console.log(progress);
-        };
         reply.onsubmit = function (event) {
             var data = formToJson(reply);
             event.preventDefault();
             data["user"] = user;
-            addReply(data, onProgress)
+            addReply(data)
                 .then(function () { return history.go(); })
-                .catch(function (error) { return console.error(error); });
+                .catch(handleError);
             return false;
         };
     });
