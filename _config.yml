@@ -19,6 +19,8 @@ defaults:
 sass:
     style: compressed
 
+markdown: kramdown
+
 prose: 
     media: assets/content
     ignore: [
@@ -39,6 +41,7 @@ prose:
         "js",
         "ts",
         "*.html",
+        "*/forum/questions",
+        "*/forum/tips-and-tricks",
+        "*/forum/trip-reports"
     ]
-
-markdown: kramdown
