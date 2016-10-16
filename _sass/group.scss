@@ -39,18 +39,37 @@ img {
     margin: 0 16px;
 }
 
-.pagination__prev, .pagination__next {
+.pagination__prev.disabled, .pagination__next.disabled {
     color: #9E9E9E;
 } 
-.pagination__prev:hover, .pagination__next:hover {
+.pagination__prev.disabled:hover, .pagination__next.disabled:hover {
     text-decoration: none;
 }
 
-.pagination__prev[href]:hover, .pagination__next[href]:hover {
-    text-decoration: underline;
+.spinner {
+    align-self: center;
+
+    margin: 16px 0;
+    width: 24px;
+    height: 24px;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-name: spin;
+    animation-timing-function: linear;
 }
-.pagination__prev[href], .pagination__next[href] {
-    color: #616161;
+
+@keyframes spin {
+    from { transform: rotate(0) }
+    to { transform: rotate(360deg) }
+}
+
+.error {
+    text-transform: lowercase;
+    padding: 16px;
+
+    a {
+        text-transform: lowercase;
+    }
 }
 
 @media (max-width: 870px) {
