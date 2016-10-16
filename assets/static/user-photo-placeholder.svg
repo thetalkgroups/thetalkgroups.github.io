@@ -1,11 +1,7 @@
 <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
   <ellipse fill="#9e9e9e" stroke="#000" stroke-width="0" cx="100" cy="100" rx="100" ry="100"/>
-  <ellipse fill="#eeeeee" stroke="#0f0f00" stroke-width="0" cx="647.5" cy="131" ry="0.5"/>
-  <path fill="#9e9e9e" stroke="#000" stroke-width="0" stroke-opacity="null" d="m2.5,122.5l196.5,-2.5l-196.5,2.5z" id="svg_3"/>
   <ellipse fill="#eeeeee" stroke="#000" stroke-width="0" stroke-opacity="null" cx="100" cy="86" rx="45" ry="45"/>
   <ellipse stroke="#000" fill="#eeeeee" stroke-width="0" stroke-opacity="null" cx="100" cy="168.770268" rx="58.499998" ry="39.770267"/>
-  <path fill="#eeeeee" stroke="#000" stroke-width="0" stroke-opacity="null" opacity="0.5" d="m205.5,207.5l-24.5,-16.5" id="svg_9"/>
-  <path fill="#eeeeee" stroke="#000" stroke-width="0" stroke-opacity="null" opacity="0.5" d="m120.5,185.5" id="svg_10"/>
   <rect height="53" width="117" y="166.5" x="41.5" fill-opacity="null" stroke-opacity="null" stroke-width="0" stroke="#000" fill="#eeeeee"/>
   <path fill="#ffffff" stroke-width="0" stroke-opacity="null" d="m-97.2225,100.76252l0,0c0,-109.35238 88.64766,-198.00002 198.00006,-198.00002l0,0c52.51286,0 102.87498,20.86064 140.00717,57.99285c37.13222,37.13222 57.9929,87.49428 57.9929,140.00717l0,0c0,109.35236 -88.64766,198.00002 -198.00007,198.00002l0,0c-109.35239,0 -198.00006,-88.64766 -198.00006,-198.00002zm99.00003,0l0,0c0,54.67617 44.32386,99.00001 99.00003,99.00001c54.67622,0 99.00004,-44.32384 99.00004,-99.00001c0,-54.67618 -44.32385,-99.00001 -99.00004,-99.00001l0,0c-54.67617,0 -99.00003,44.32384 -99.00003,99.00001z" stroke="#000"/>
 </svg>
