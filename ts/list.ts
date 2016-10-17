@@ -6,7 +6,6 @@ import { Item } from "./types/item";
 import { initPagination } from "./pagination";
 
 declare const prefix: string
-
 const normalList = new List<Item>(prefix);
 const stickyList = new List<Item>(prefix + "/sticky");
 
@@ -42,11 +41,13 @@ window.addEventListener("load", () => {
     const list = document.querySelector(".list");
     const pagination = document.querySelector(".pagination");
     const errorEl = document.querySelector(".error");
+    const errorMessage = document.querySelector(".error__message");
 
     const handleError = (error: any) => {
         console.error(error);
 
         errorEl.removeAttribute("hidden");
+        errorMessage.innerHTML = error.toString();
 
         list.setAttribute("hidden", "");
         pagination.setAttribute("hidden", "");
@@ -55,6 +56,10 @@ window.addEventListener("load", () => {
 
     userService.user
         .subscribe(user => {
+            const userId = user ? user.id : "UNSET"
+            stickyList.setUserId(userId);
+            normalList.setUserId(userId);
+            
             if (!user) {
                 askAQuestion.hidden = true;
 
@@ -84,7 +89,7 @@ window.addEventListener("load", () => {
 
                         return stickyItems.numberOfPages;
                     });
-            });
+            })
     } 
     
     refreshList(page)
@@ -93,7 +98,7 @@ window.addEventListener("load", () => {
                 pagination.setAttribute("hidden", "");
             }
             else {
-                initPagination(page, numberOfPages, refreshList)
+                initPagination(page, numberOfPages, refreshList, handleError)
             }
         })
         .catch(handleError);

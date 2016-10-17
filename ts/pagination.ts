@@ -1,4 +1,6 @@
-export const initPagination = (page: number, numberOfPages: number, refreshList: (page:number) => any) => {
+import { getPage } from "./api-globals"
+
+export const initPagination = (page: number, numberOfPages: number, refreshList: (page:number) => Promise<any>, handleError: (error: any) => void) => {
     const prev = document.querySelector(".pagination__prev") as HTMLAnchorElement;
     const next = document.querySelector(".pagination__next") as HTMLAnchorElement;
     const pageEl = document.querySelector(".pagination__page");
@@ -17,25 +19,36 @@ export const initPagination = (page: number, numberOfPages: number, refreshList:
 
         pageEl.innerHTML = page + " of " + numberOfPages;
     };
+    const urlWithoutPage = getUrlWithoutPage();
+
+    window.addEventListener("popstate", () => location.reload());
 
     prev.onclick = () => {
         if (prev.classList.contains("disabled")) return;
 
         page -= 1;
         updatePage();
-        refreshList(page);
+        refreshList(page).catch(handleError);
     }
+    
     next.onclick = () => {
         if (next.classList.contains("disabled")) return;
 
         page += 1;
         updatePage();
-        refreshList(page);
+        refreshList(page).catch(handleError);
     };
 
     updatePage()
 }
 
+const getUrlWithoutPage = () => {
+    const url = new URL(location.href);
+
+    url.search = url.search.replace(/page=\d+/, "");
+
+    return url.toString();
+}
 const getUrlWithPage = (page: number) => {
     const url = new URL(location.href);
 
