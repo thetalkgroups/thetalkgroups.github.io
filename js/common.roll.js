@@ -63,10 +63,9 @@ var UserService = (function () {
 }());
 
 var clearItemsFromCahce = function () { return Object.keys(localStorage)
-    .filter(function (k) { return k.startsWith("/group"); })
+    .filter(function (k) { return k.startsWith("/item"); })
     .forEach(function (k) { return localStorage.removeItem(k); }); };
 var userService = new UserService();
-
 var isParentOf = function (target, selector) {
     if (target.nodeName === "HTML")
         return false;
@@ -74,6 +73,7 @@ var isParentOf = function (target, selector) {
         return true;
     return isParentOf(target.parentNode, selector);
 };
+
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");

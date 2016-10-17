@@ -1,16 +1,10 @@
 import "./user-service"
-import { clearItemsFromCahce, userService } from "./globals"
+import { clearItemsFromCahce, userService, isParentOf } from "./globals"
 import { User } from "./types/user";
 
 declare const headerImageHWRatio: number;
 
-const isParentOf = (target: HTMLElement, selector: string): boolean => {
-    if (target.nodeName === "HTML") return false;
 
-    if (target.matches(selector)) return true;
-
-    return isParentOf(target.parentNode as HTMLElement, selector);
-};
 
 window.addEventListener("load", () => {
     const navigation = document.querySelector(".navigation");

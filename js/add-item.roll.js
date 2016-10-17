@@ -63,10 +63,9 @@ var UserService = (function () {
 }());
 
 var clearItemsFromCahce = function () { return Object.keys(localStorage)
-    .filter(function (k) { return k.startsWith("/group"); })
+    .filter(function (k) { return k.startsWith("/item"); })
     .forEach(function (k) { return localStorage.removeItem(k); }); };
 var userService = new UserService();
-
 var isParentOf = function (target, selector) {
     if (target.nodeName === "HTML")
         return false;
@@ -74,6 +73,7 @@ var isParentOf = function (target, selector) {
         return true;
     return isParentOf(target.parentNode, selector);
 };
+
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");
@@ -165,7 +165,7 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST = "http://localhost:4001";
+var HOST = "http://localhost:8000";
 var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
 var formToJson = function (form) {
     var formData = new FormData(form);
@@ -176,11 +176,21 @@ var formToJson = function (form) {
     return json;
 };
 
-var addItem = function (data) {
+var addItem = function (data, userId) {
     return fetch(HOST + prefix, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": userId
+        },
         body: JSON.stringify(data)
+    })
+        .then(function (res) {
+        if (!res.ok) {
+            res.text().then(function (text) { return console.error(text); });
+            return;
+        }
+        return res;
     });
 };
 window.addEventListener("load", function () {
@@ -229,7 +239,7 @@ window.addEventListener("load", function () {
                 content: otherFormData,
                 fields: fields.map(function (field) { return field.name; })
             };
-            addItem(data)
+            addItem(data, user.id)
                 .then(function () { return location.href = location.href.replace(/[\w-]+\.html$/, ""); })
                 .catch(function (error) { return console.error(error); });
             return false;

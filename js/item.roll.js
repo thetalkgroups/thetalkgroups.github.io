@@ -63,10 +63,9 @@ var UserService = (function () {
 }());
 
 var clearItemsFromCahce = function () { return Object.keys(localStorage)
-    .filter(function (k) { return k.startsWith("/group"); })
+    .filter(function (k) { return k.startsWith("/item"); })
     .forEach(function (k) { return localStorage.removeItem(k); }); };
 var userService = new UserService();
-
 var isParentOf = function (target, selector) {
     if (target.nodeName === "HTML")
         return false;
@@ -74,6 +73,7 @@ var isParentOf = function (target, selector) {
         return true;
     return isParentOf(target.parentNode, selector);
 };
+
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");
@@ -165,7 +165,7 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST = "http://localhost:4001";
+var HOST = "http://localhost:8000";
 var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
 var formToJson = function (form) {
     var formData = new FormData(form);
@@ -175,14 +175,30 @@ var formToJson = function (form) {
     });
     return json;
 };
-var setItemToCache = function (prefix, item) { return localStorage.setItem(prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
-var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem(prefix.replace("/sticky", "") + "/" + id)); };
+var setItemToCache = function (prefix, item) { return localStorage.setItem("/item" + prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
+var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem("/item" + prefix.replace("/sticky", "") + "/" + id)); };
+var getPage = function () {
+    var page = 1;
+    var pageMatch = location.search.match(/page=(\d+)/);
+    if (pageMatch)
+        page = parseInt(pageMatch[1], 10) || 1;
+    return page;
+};
+var getId = function (handleError) {
+    var idMatch = location.search.match(/id=(\w+)/);
+    if (!idMatch) {
+        return handleError(new Error("id missing"));
+    }
+    return idMatch[1];
+};
 
 var List = (function () {
     function List(prefix) {
         this.prefix = prefix;
+        this.userId = "UNSET";
     }
-    List.prototype.getItems = function (page, offset, userId) {
+    List.prototype.setUserId = function (userId) { this.userId = userId; };
+    List.prototype.getItems = function (page, offset) {
         var _this = this;
         if (offset === void 0) { offset = 0; }
         return this.listItems(page, offset).then(function (_a) {
@@ -198,29 +214,40 @@ var List = (function () {
             });
             if (newIds.length === 0)
                 return { items: cachedItems, numberOfPages: numberOfPages };
-            return _this.fetchItems(newIds, userId).then(function (newItems) {
+            return _this.fetchItems(newIds).then(function (newItems) {
                 newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
                 return { items: cachedItems.concat(newItems), numberOfPages: numberOfPages };
             });
         });
     };
     List.prototype.listItems = function (page, offset) {
-        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset).then(function (res) { return res.json(); });
+        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset, {
+            headers: { "Authorization": this.userId }
+        }).then(function (res) {
+            console.log(res.ok);
+            if (!res.ok)
+                return res.text().then(function (text) { throw text; });
+            return res.json();
+        });
     };
-    List.prototype.fetchItems = function (ids, userId) {
+    List.prototype.fetchItems = function (ids) {
         return fetch(HOST + this.prefix + "/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": userId
+                "Authorization": this.userId
             },
             body: JSON.stringify(ids)
-        }).then(function (res) { return res.json(); });
+        }).then(function (res) {
+            if (!res.ok)
+                return res.text().then(function (text) { throw text; });
+            return res.json();
+        });
     };
     return List;
 }());
 
-var initPagination = function (page, numberOfPages, refreshList) {
+var initPagination = function (page, numberOfPages, refreshList, handleError) {
     var prev = document.querySelector(".pagination__prev");
     var next = document.querySelector(".pagination__next");
     var pageEl = document.querySelector(".pagination__page");
@@ -236,21 +263,28 @@ var initPagination = function (page, numberOfPages, refreshList) {
         history.pushState(null, null, getUrlWithPage(page));
         pageEl.innerHTML = page + " of " + numberOfPages;
     };
+    var urlWithoutPage = getUrlWithoutPage();
+    window.addEventListener("popstate", function () { return location.reload(); });
     prev.onclick = function () {
         if (prev.classList.contains("disabled"))
             return;
         page -= 1;
         updatePage();
-        refreshList(page);
+        refreshList(page).catch(handleError);
     };
     next.onclick = function () {
         if (next.classList.contains("disabled"))
             return;
         page += 1;
         updatePage();
-        refreshList(page);
+        refreshList(page).catch(handleError);
     };
     updatePage();
+};
+var getUrlWithoutPage = function () {
+    var url = new URL(location.href);
+    url.search = url.search.replace(/page=\d+/, "");
+    return url.toString();
 };
 var getUrlWithPage = function (page) {
     var url = new URL(location.href);
@@ -266,6 +300,7 @@ var getUrlWithPage = function (page) {
     return url.toString();
 };
 
+var userId = "UNSET";
 window.addEventListener("load", function () {
     var replysEl = document.querySelector(".replys");
     var itemHeader = document.querySelector(".item__header");
@@ -275,6 +310,9 @@ window.addEventListener("load", function () {
     var itemTitle = document.querySelector(".item__title");
     var itemContent = document.querySelector(".item__content");
     var itemSpinner = document.querySelector(".item__spinner");
+    var itemAdminActions = document.querySelector(".item__header .admin-actions");
+    var itemBanButton = document.querySelector(".item__header .admin-actions__ban");
+    var itemKickButton = document.querySelector(".item__header .admin-actions__kick");
     var loginWarning = document.querySelector(".login-warning");
     var reply = document.querySelector(".reply-form");
     var uploadedImageEl = document.querySelector(".reply-form__uploaded-image");
@@ -286,9 +324,16 @@ window.addEventListener("load", function () {
     var pagination = document.querySelector(".pagination");
     var replysSpinner = document.querySelector(".replys__spinner");
     var errorEl = document.querySelector(".error");
+    var errorMessage = document.querySelector(".error__message");
+    var kickUserPrompt = document.querySelector(".kick-user-prompt");
+    var kickUserAmount = document.querySelector(".kick-user-prompt__amount");
+    var kickUserMeasurement = document.querySelector(".kick-user-prompt__measurement");
+    var kickUserButton = document.querySelector(".kick-user-prompt__button");
+    var kickUserCancle = document.querySelector(".kick-user-prompt__cancle");
     var handleError = function (error) {
         console.error(error);
         errorEl.removeAttribute("hidden");
+        errorMessage.innerHTML = error.toString();
         clearTimeout(replySpinnerTimeoutId);
         itemHeader.setAttribute("hidden", "");
         replysSpinner.setAttribute("hidden", "");
@@ -297,23 +342,21 @@ window.addEventListener("load", function () {
         pagination.setAttribute("hidden", "");
         loginWarning.setAttribute("hidden", "");
     };
-    var idMatch = location.search.match(/id=(\w+)/);
-    var id;
-    if (!idMatch) {
-        return handleError(new Error("id missing"));
-    }
-    else {
-        id = idMatch[1];
-    }
+    var id = getId(handleError);
+    if (!id)
+        return;
     var replyPrefix = prefix + ("/" + id + "/replys");
     var replyList = new List(replyPrefix);
-    var deleteItem = function (id, userId, pre) {
+    var deleteItem = function (id, pre) {
         return fetch("" + HOST + pre + "/" + id, {
             method: "DELETE",
             headers: { "Authorization": userId }
+        }).then(function (res) {
+            if (!res.ok)
+                return res.text().then(function (text) { throw text; });
         });
     };
-    var getItem = function (userId) {
+    var getItem = function () {
         return Promise.resolve(getItemFromCache(prefix, id))
             .then(function (item) {
             if (item && item.content)
@@ -321,14 +364,19 @@ window.addEventListener("load", function () {
             return fetch(HOST + prefix + "/" + id, {
                 headers: { "Authorization": userId }
             })
-                .then(function (res) { return res.json(); })
-                .then(function (item) {
-                setItemToCache(prefix, item);
-                return item;
+                .then(function (res) {
+                if (!res.ok) {
+                    res.text().then(function (text) { return handleError(text); });
+                    return;
+                }
+                return res.json().then(function (item) {
+                    setItemToCache(prefix, item);
+                    return item;
+                });
             });
         });
     };
-    var setSticky = function (userId, sticky) {
+    var setSticky = function (sticky) {
         if (sticky === void 0) { sticky = false; }
         localStorage.removeItem(prefix + "/" + id);
         return fetch("" + HOST + prefix + "/" + id + "/sticky", {
@@ -338,6 +386,10 @@ window.addEventListener("load", function () {
                 "Content-Type": "application/json",
                 "Authorization": userId
             }
+        })
+            .then(function (res) {
+            if (!res.ok)
+                return res.text().then(function (text) { throw text; });
         });
     };
     var addReply = function (data) {
@@ -364,11 +416,15 @@ window.addEventListener("load", function () {
             return fetch(HOST + replyPrefix, {
                 method: "PUT",
                 body: JSON.stringify(data),
-                headers: { "Content-Type": "application/json" }
+                headers: { "Content-Type": "application/json", "Authorization": userId }
             });
+        })
+            .then(function (res) {
+            if (!res.ok)
+                return res.text().then(function (text) { throw text; });
         });
     };
-    var createReplyElement = function (reply, userId) {
+    var createReplyElement = function (reply) {
         var template = document.importNode(document.getElementById("reply").content, true);
         var el = document.createElement("article");
         el.appendChild(template);
@@ -378,6 +434,9 @@ window.addEventListener("load", function () {
         var answer = el.querySelector(".reply__answer");
         var image = el.querySelector(".reply__image");
         var deleteBtn = el.querySelector(".reply__delete");
+        var adminActions = el.querySelector(".admin-actions");
+        var banButton = el.querySelector(".admin-actions__ban");
+        var kickButton = el.querySelector(".admin-actions__kick");
         el.className = "reply";
         photo.src = reply.user.photo;
         name.innerHTML = reply.user.name;
@@ -389,16 +448,63 @@ window.addEventListener("load", function () {
         }
         if (reply.permission === "you" || reply.permission === "admin") {
             deleteBtn.removeAttribute("hidden");
-            deleteBtn.onclick = function (_) { return deleteItem(reply._id, userId, replyPrefix)
-                .then(function (_) { return history.go(); })
+            deleteBtn.onclick = function (_) { return deleteItem(reply._id, replyPrefix)
+                .then(function () { return history.go(); })
                 .catch(handleError); };
+            if (reply.permission === "admin") {
+                var hideAdminActions_1 = function () {
+                    adminActions.setAttribute("hidden", "");
+                    document.removeEventListener("click", hideAdminActions_1);
+                };
+                photo.onclick = function (_) {
+                    adminActions.removeAttribute("hidden");
+                    setTimeout(function () { return document.addEventListener("click", hideAdminActions_1); });
+                };
+                banButton.onclick = function (_) { return banUser(reply.user.name, replyPrefix, reply._id); };
+                kickButton.onclick = function (_) { return kickUser(replyPrefix, reply._id); };
+            }
         }
         return el;
     };
-    var page = 1;
-    var pageMatch = location.search.match(/page=(\d+)/);
-    if (pageMatch)
-        page = parseInt(pageMatch[1], 10) || 1;
+    var banUser = function (username, prefix, itemId) {
+        confirm("Are you sure you want to ban '" + username + "'?")
+            ? fetch(HOST + "/users/ban/", {
+                method: "PUT",
+                body: JSON.stringify({ prefix: prefix, itemId: itemId }),
+                headers: { "Content-Type": "application/json", "Authorization": userId }
+            })
+                .then(function (res) {
+                if (!res.ok)
+                    return res.text().then(function (text) { throw text; });
+            })
+                .catch(handleError)
+            : null;
+    };
+    var kickUser = function (pre, itemId) {
+        kickUserPrompt.removeAttribute("hidden");
+        kickUserCancle.onclick = function (_) {
+            kickUserPrompt.setAttribute("hidden", "");
+            kickUserAmount.value = "0";
+            kickUserMeasurement.selectedIndex = 0;
+        };
+        kickUserButton.onclick = function (_) {
+            var measurement = parseInt(kickUserMeasurement.selectedOptions[0].value, 10);
+            var amount = parseInt(kickUserAmount.value, 10);
+            var kickTime = amount * measurement;
+            fetch(HOST + "/users/kick/" + kickTime, {
+                method: "PUT",
+                body: JSON.stringify({ prefix: pre, itemId: itemId }),
+                headers: { "Content-Type": "application/json", "Authorization": userId }
+            })
+                .then(function (res) {
+                if (!res.ok)
+                    return res.text().then(function (text) { throw text; });
+                kickUserPrompt.setAttribute("hidden", "");
+            })
+                .catch(handleError);
+        };
+    };
+    var page = getPage();
     var replySpinnerTimeoutId = -1;
     imageInput.addEventListener("change", function () {
         var fr = new FileReader();
@@ -412,21 +518,22 @@ window.addEventListener("load", function () {
     });
     var itemSpinnerTimeoutId = setTimeout(function () { return itemSpinner.removeAttribute("hidden"); }, 100);
     userService.user.subscribe(function (user) {
-        var userId = user ? user.id : null;
+        userId = user ? user.id : "UNSET";
+        replyList.setUserId(userId);
         var listReplys = function (page) {
             replySpinnerTimeoutId = setTimeout(function () { return replysSpinner.removeAttribute("hidden"); }, 100);
             replysEl.innerHTML = "";
-            return replyList.getItems(page, 0, userId)
+            return replyList.getItems(page, 0)
                 .then(function (value) {
                 clearTimeout(replySpinnerTimeoutId);
                 replysSpinner.setAttribute("hidden", "");
                 var items = value.items, numberOfPages = value.numberOfPages;
-                items.map(function (reply) { return createReplyElement(reply, userId); })
+                items.map(function (reply) { return createReplyElement(reply); })
                     .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
                 return value;
             });
         };
-        getItem(userId)
+        getItem()
             .then(function (item) {
             clearTimeout(itemSpinnerTimeoutId);
             itemSpinner.setAttribute("hidden", "");
@@ -437,15 +544,25 @@ window.addEventListener("load", function () {
             if (item.permission === "you" || item.permission === "admin") {
                 buttons.removeAttribute("hidden");
                 deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSinglar + "?")
-                    ? deleteItem(id, userId, prefix)
+                    ? deleteItem(id, prefix)
                         .then(function (_) { return location.href = location.href.replace(/\w+\.html.*?$/, ""); })
                         .catch(handleError)
                     : undefined; };
                 if (item.permission === "admin") {
+                    var hideItemAdminActions_1 = function () {
+                        itemAdminActions.setAttribute("hidden", "");
+                        document.removeEventListener("click", hideItemAdminActions_1);
+                    };
+                    itemPhoto.onclick = function (_) {
+                        itemAdminActions.removeAttribute("hidden");
+                        setTimeout(function () { return document.addEventListener("click", hideItemAdminActions_1); });
+                    };
+                    itemBanButton.onclick = function (_) { return banUser(item.user.name, prefix, item._id); };
+                    itemKickButton.onclick = function (_) { return kickUser(prefix, item._id); };
                     stickyButton.removeAttribute("hidden");
                     stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
                     stickyButton.onclick = function (_) { return confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar))
-                        ? setSticky(userId, item.sticky)
+                        ? setSticky(item.sticky)
                             .then(function (_) { return history.go(); })
                             .catch(handleError)
                         : undefined; };
@@ -454,20 +571,20 @@ window.addEventListener("load", function () {
             var content = Object.keys(item.content)
                 .reduce(function (content, k) { return content + ("<div class=\"" + k + "\">" + item.content[k] + "</div>"); });
             itemContent.innerHTML = content;
-        })
-            .catch(handleError);
-        listReplys(page)
-            .then(function (_a) {
-            var items = _a.items, numberOfPages = _a.numberOfPages;
-            if (numberOfPages === 1 || numberOfPages === 0) {
-                pagination.setAttribute("hidden", "");
-            }
-            else {
-                initPagination(page, numberOfPages, listReplys);
-            }
-            if (items.length === 0) {
-                noReplys.removeAttribute("hidden");
-            }
+            listReplys(page)
+                .then(function (_a) {
+                var items = _a.items, numberOfPages = _a.numberOfPages;
+                if (numberOfPages === 1 || numberOfPages === 0) {
+                    pagination.setAttribute("hidden", "");
+                }
+                else {
+                    initPagination(page, numberOfPages, listReplys, handleError);
+                }
+                if (items.length === 0) {
+                    noReplys.removeAttribute("hidden");
+                }
+            })
+                .catch(handleError);
         })
             .catch(handleError);
         if (!user) {

@@ -63,10 +63,9 @@ var UserService = (function () {
 }());
 
 var clearItemsFromCahce = function () { return Object.keys(localStorage)
-    .filter(function (k) { return k.startsWith("/group"); })
+    .filter(function (k) { return k.startsWith("/item"); })
     .forEach(function (k) { return localStorage.removeItem(k); }); };
 var userService = new UserService();
-
 var isParentOf = function (target, selector) {
     if (target.nodeName === "HTML")
         return false;
@@ -74,6 +73,7 @@ var isParentOf = function (target, selector) {
         return true;
     return isParentOf(target.parentNode, selector);
 };
+
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");
@@ -165,17 +165,19 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST = "http://localhost:4001";
+var HOST = "http://localhost:8000";
 var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
 
-var setItemToCache = function (prefix, item) { return localStorage.setItem(prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
-var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem(prefix.replace("/sticky", "") + "/" + id)); };
+var setItemToCache = function (prefix, item) { return localStorage.setItem("/item" + prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
+var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem("/item" + prefix.replace("/sticky", "") + "/" + id)); };
 
 var List = (function () {
     function List(prefix) {
         this.prefix = prefix;
+        this.userId = "UNSET";
     }
-    List.prototype.getItems = function (page, offset, userId) {
+    List.prototype.setUserId = function (userId) { this.userId = userId; };
+    List.prototype.getItems = function (page, offset) {
         var _this = this;
         if (offset === void 0) { offset = 0; }
         return this.listItems(page, offset).then(function (_a) {
@@ -191,29 +193,39 @@ var List = (function () {
             });
             if (newIds.length === 0)
                 return { items: cachedItems, numberOfPages: numberOfPages };
-            return _this.fetchItems(newIds, userId).then(function (newItems) {
+            return _this.fetchItems(newIds).then(function (newItems) {
                 newItems.forEach(function (newItem) { return setItemToCache(_this.prefix, newItem); });
                 return { items: cachedItems.concat(newItems), numberOfPages: numberOfPages };
             });
         });
     };
     List.prototype.listItems = function (page, offset) {
-        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset).then(function (res) { return res.json(); });
+        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset, {
+            headers: { "Authorization": this.userId }
+        }).then(function (res) {
+            if (!res.ok)
+                return res.text().then(function (text) { throw text; });
+            return res.json();
+        });
     };
-    List.prototype.fetchItems = function (ids, userId) {
+    List.prototype.fetchItems = function (ids) {
         return fetch(HOST + this.prefix + "/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": userId
+                "Authorization": this.userId
             },
             body: JSON.stringify(ids)
-        }).then(function (res) { return res.json(); });
+        }).then(function (res) {
+            if (!res.ok)
+                return res.text().then(function (text) { throw text; });
+            return res.json();
+        });
     };
     return List;
 }());
 
-var initPagination = function (page, numberOfPages, refreshList) {
+var initPagination = function (page, numberOfPages, refreshList, handleError) {
     var prev = document.querySelector(".pagination__prev");
     var next = document.querySelector(".pagination__next");
     var pageEl = document.querySelector(".pagination__page");
@@ -229,21 +241,28 @@ var initPagination = function (page, numberOfPages, refreshList) {
         history.pushState(null, null, getUrlWithPage(page));
         pageEl.innerHTML = page + " of " + numberOfPages;
     };
+    var urlWithoutPage = getUrlWithoutPage();
+    window.addEventListener("popstate", function () { return location.reload(); });
     prev.onclick = function () {
         if (prev.classList.contains("disabled"))
             return;
         page -= 1;
         updatePage();
-        refreshList(page);
+        refreshList(page).catch(handleError);
     };
     next.onclick = function () {
         if (next.classList.contains("disabled"))
             return;
         page += 1;
         updatePage();
-        refreshList(page);
+        refreshList(page).catch(handleError);
     };
     updatePage();
+};
+var getUrlWithoutPage = function () {
+    var url = new URL(location.href);
+    url.search = url.search.replace(/page=\d+/, "");
+    return url.toString();
 };
 var getUrlWithPage = function (page) {
     var url = new URL(location.href);
@@ -287,15 +306,20 @@ window.addEventListener("load", function () {
     var list = document.querySelector(".list");
     var pagination = document.querySelector(".pagination");
     var errorEl = document.querySelector(".error");
+    var errorMessage = document.querySelector(".error__message");
     var handleError = function (error) {
         console.error(error);
         errorEl.removeAttribute("hidden");
+        errorMessage.innerHTML = error.toString();
         list.setAttribute("hidden", "");
         pagination.setAttribute("hidden", "");
         askAQuestion.setAttribute("hidden", "");
     };
     userService.user
         .subscribe(function (user) {
+        var userId = user ? user.id : "UNSET";
+        stickyList.setUserId(userId);
+        normalList.setUserId(userId);
         if (!user) {
             askAQuestion.hidden = true;
             return;
@@ -324,7 +348,7 @@ window.addEventListener("load", function () {
             pagination.setAttribute("hidden", "");
         }
         else {
-            initPagination(page, numberOfPages, refreshList);
+            initPagination(page, numberOfPages, refreshList, handleError);
         }
     })
         .catch(handleError);
