@@ -47,7 +47,7 @@ window.addEventListener("load", () => {
         console.error(error);
 
         errorEl.removeAttribute("hidden");
-        errorMessage.innerHTML = error.toString();
+        errorMessage.innerHTML = error.constructor.name.endsWith("Error") ? error.message : error.toString();
 
         list.setAttribute("hidden", "");
         pagination.setAttribute("hidden", "");

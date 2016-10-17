@@ -44,7 +44,7 @@ window.addEventListener("load", () => {
 
         errorEl.removeAttribute("hidden");
 
-        errorMessage.innerHTML = error.toString();
+        errorMessage.innerHTML = error.constructor.name.endsWith("Error") ? error.message : error.toString();
 
         clearTimeout(replySpinnerTimeoutId);
 

@@ -224,7 +224,6 @@ var List = (function () {
         return fetch(HOST + this.prefix + "/list/" + page + "-" + offset, {
             headers: { "Authorization": this.userId }
         }).then(function (res) {
-            console.log(res.ok);
             if (!res.ok)
                 return res.text().then(function (text) { throw text; });
             return res.json();
@@ -333,7 +332,7 @@ window.addEventListener("load", function () {
     var handleError = function (error) {
         console.error(error);
         errorEl.removeAttribute("hidden");
-        errorMessage.innerHTML = error.toString();
+        errorMessage.innerHTML = error.constructor.name.endsWith("Error") ? error.message : error.toString();
         clearTimeout(replySpinnerTimeoutId);
         itemHeader.setAttribute("hidden", "");
         replysSpinner.setAttribute("hidden", "");
@@ -365,14 +364,14 @@ window.addEventListener("load", function () {
                 headers: { "Authorization": userId }
             })
                 .then(function (res) {
-                if (!res.ok) {
-                    res.text().then(function (text) { return handleError(text); });
-                    return;
+                if (!res.ok)
+                    res.text().then(function (text) { throw text; });
+                else {
+                    return res.json().then(function (item) {
+                        setItemToCache(prefix, item);
+                        return item;
+                    });
                 }
-                return res.json().then(function (item) {
-                    setItemToCache(prefix, item);
-                    return item;
-                });
             });
         });
     };
