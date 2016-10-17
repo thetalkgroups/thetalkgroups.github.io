@@ -7,12 +7,23 @@ import { User } from "./types/user"
 declare const fields: { name: string, type: string, required: boolean }[]
 declare const prefix: string
 
-const addItem = (data: any) =>
+const addItem = (data: any, userId: string) =>
     fetch(HOST + prefix, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json", 
+            "Authorization": userId 
+        },
         body: JSON.stringify(data)
     })
+        .then(res => {
+            if (!res.ok) {
+                res.text().then(text => console.error(text))
+                return;
+            }
+
+            return res;
+        })
 
 window.addEventListener("load", () => {
     const loginWarning = document.querySelector(".login-warning") as HTMLElement;
@@ -75,7 +86,7 @@ window.addEventListener("load", () => {
                 fields: fields.map(field => field.name) 
             };
 
-            addItem(data)
+            addItem(data, user.id)
                 .then(() => location.href = location.href.replace(/[\w-]+\.html$/, ""))
                 .catch(error => console.error(error));
 

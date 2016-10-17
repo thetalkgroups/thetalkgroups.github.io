@@ -72,6 +72,56 @@ img {
     }
 }
 
+.admin-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 70px;
+    position: absolute;
+    left: 30px;
+    top: 20px;
+
+    button {
+        margin: 0 0 8px 0;
+        padding: 0 !important;
+    }
+    button:last-child {
+        margin: 0;
+    }
+}
+.admin-actions[hidden] {
+    display: none;
+}
+
+.kick-user-prompt {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 1;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.kick-user-prompt[hidden] {
+    display: none;
+}
+
+.kick-user-prompt__inputs {
+    margin-bottom: 16px;
+}
+.kick-user-prompt__buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    button {
+        margin-right: 16px;
+    }
+    button:last-child {
+        margin-right: 0;
+    }
+}
+
 @media (max-width: 870px) {
     .minor-header {
         padding: 0 16px;

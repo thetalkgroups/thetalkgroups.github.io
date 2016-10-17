@@ -1,5 +1,6 @@
 <template id="reply">
     <img class="reply__photo" alt="photo">
+    {% include admin-actions.html %}
     <section class="reply__text">
         <header class="reply__header">
             <section>
@@ -14,11 +15,13 @@
 </template>
 
 {% include error-message.html %}
+{% include kick-user-prompt.html %}
 
 <section class="item__header">
     <header class="item__header__top">
         <section class="item__header__top__content">
             <img class="item__photo" alt="photo">
+            {% include admin-actions.html %}
             <section>
                 <p class="item__name"></p>
                 <p class="item__date"></p>
