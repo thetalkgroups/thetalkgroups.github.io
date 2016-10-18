@@ -8,6 +8,11 @@
 
 {% include error-message.html %}
 
+<header class="list-header">
+    <h2>{{ include.title }}</h2>
+    <a class="list-header__add-item" href="add-item.html" hidden>{{ include.addItemText }}</a>
+</header>
+
 <section class="list">
     <img class="spinner" src="/assets/static/spinner.png" alt="spinner">
     <section class="list__sticky"></section>
