@@ -1,0 +1,15 @@
+---
+layout: group
+group: thc
+head: >
+    <link rel="stylesheet" href="/css/item.css" async>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js" async defer></script>
+---
+
+<script>
+    const collection = "tips-and-tricks";
+    const prefix = "{{ site.data[page.group].baseUrl }}/" + collection;
+</script>
+<script src="/js/item.roll.js" async defer></script>
+
+{% include item.html %}

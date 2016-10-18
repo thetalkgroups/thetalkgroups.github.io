@@ -166,7 +166,12 @@ window.addEventListener("load", function () {
 });
 
 var HOST = "http://localhost:8000";
-var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
+var collectionMap = {
+    "questions": "question",
+    "tips-and-tricks": "tip",
+    "trip-reports": "report"
+};
+var itemSingular = function (collection) { return collectionMap[collection]; };
 var formToJson = function (form) {
     var formData = new FormData(form);
     var json = {};
@@ -195,13 +200,11 @@ var getId = function (handleError) {
 var List = (function () {
     function List(prefix) {
         this.prefix = prefix;
-        this.userId = "UNSET";
     }
     List.prototype.setUserId = function (userId) { this.userId = userId; };
-    List.prototype.getItems = function (page, offset) {
+    List.prototype.getItems = function (page) {
         var _this = this;
-        if (offset === void 0) { offset = 0; }
-        return this.listItems(page, offset).then(function (_a) {
+        return this.listItems(page).then(function (_a) {
             var ids = _a.ids, numberOfPages = _a.numberOfPages;
             var cachedItems = [];
             var newIds = [];
@@ -220,9 +223,9 @@ var List = (function () {
             });
         });
     };
-    List.prototype.listItems = function (page, offset) {
-        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset, {
-            headers: { "Authorization": this.userId }
+    List.prototype.listItems = function (page) {
+        return fetch(HOST + this.prefix + "/list/" + page, {
+            headers: { "Authorization": this.userId || "UNSET" }
         }).then(function (res) {
             if (!res.ok)
                 return res.text().then(function (text) { throw text; });
@@ -234,7 +237,7 @@ var List = (function () {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": this.userId
+                "Authorization": this.userId || "UNSET"
             },
             body: JSON.stringify(ids)
         }).then(function (res) {
@@ -306,7 +309,8 @@ var getUrlWithPage = function (page) {
     return url.toString();
 };
 
-var userId = "UNSET";
+var userId = null;
+var wasUnset = false;
 window.addEventListener("load", function () {
     var replysEl = document.querySelector(".replys");
     var itemHeader = document.querySelector(".item__header");
@@ -336,6 +340,8 @@ window.addEventListener("load", function () {
     var kickUserMeasurement = document.querySelector(".kick-user-prompt__measurement");
     var kickUserButton = document.querySelector(".kick-user-prompt__button");
     var kickUserCancle = document.querySelector(".kick-user-prompt__cancle");
+    var breadcrumbSection = document.querySelector(".breadcrumb p");
+    breadcrumbSection.innerHTML = itemSingular(collection);
     var handleError = function (error) {
         console.error(error);
         errorEl.removeAttribute("hidden");
@@ -362,7 +368,9 @@ window.addEventListener("load", function () {
                 return res.text().then(function (text) { throw text; });
         });
     };
+    var itemSpinnerTimeoutId;
     var getItem = function () {
+        itemSpinnerTimeoutId = setTimeout(function () { return itemSpinner.removeAttribute("hidden"); }, 100);
         return Promise.resolve(getItemFromCache(prefix, id))
             .then(function (item) {
             if (item && item.content)
@@ -384,7 +392,7 @@ window.addEventListener("load", function () {
     };
     var setSticky = function (sticky) {
         if (sticky === void 0) { sticky = false; }
-        localStorage.removeItem(prefix + "/" + id);
+        localStorage.removeItem("/item" + prefix + "/" + id);
         return fetch("" + HOST + prefix + "/" + id + "/sticky", {
             method: "POST",
             body: JSON.stringify({ value: sticky }),
@@ -522,75 +530,84 @@ window.addEventListener("load", function () {
         };
         fr.readAsDataURL(uploadedImage);
     });
-    var itemSpinnerTimeoutId = setTimeout(function () { return itemSpinner.removeAttribute("hidden"); }, 100);
-    userService.user.subscribe(function (user) {
-        userId = user ? user.id : "UNSET";
-        replyList.setUserId(userId);
-        var listReplys = function (page) {
-            replySpinnerTimeoutId = setTimeout(function () { return replysSpinner.removeAttribute("hidden"); }, 100);
-            replysEl.innerHTML = "";
-            return replyList.getItems(page, 0)
-                .then(function (value) {
-                clearTimeout(replySpinnerTimeoutId);
-                replysSpinner.setAttribute("hidden", "");
-                var items = value.items, numberOfPages = value.numberOfPages;
-                items.map(function (reply) { return createReplyElement(reply); })
-                    .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
-                return value;
-            });
-        };
-        getItem()
-            .then(function (item) {
-            clearTimeout(itemSpinnerTimeoutId);
-            itemSpinner.setAttribute("hidden", "");
-            itemPhoto.src = item.user.photo;
-            itemName.innerHTML = item.user.name;
-            itemDate.innerHTML = moment(item.date).fromNow();
-            itemTitle.innerHTML = item.title;
-            if (item.permission === "you" || item.permission === "admin") {
-                buttons.removeAttribute("hidden");
-                deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSinglar + "?")
-                    ? deleteItem(id, prefix)
-                        .then(function (_) { return location.href = location.href.replace(/\w+\.html.*?$/, ""); })
+    var showItem = function (item) {
+        clearTimeout(itemSpinnerTimeoutId);
+        itemSpinner.setAttribute("hidden", "");
+        itemPhoto.src = item.user.photo;
+        itemName.innerHTML = item.user.name;
+        itemDate.innerHTML = moment(item.date).fromNow();
+        itemTitle.innerHTML = item.title;
+        if (item.permission === "you" || item.permission === "admin") {
+            buttons.removeAttribute("hidden");
+            deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSingular(collection) + "?")
+                ? deleteItem(id, prefix)
+                    .then(function (_) { return location.href = location.href.replace(/\w+\.html.*?$/, ""); })
+                    .catch(handleError)
+                : undefined; };
+            if (item.permission === "admin") {
+                var hideItemAdminActions_1 = function () {
+                    itemAdminActions.setAttribute("hidden", "");
+                    document.removeEventListener("click", hideItemAdminActions_1);
+                };
+                itemPhoto.onclick = function (_) {
+                    itemAdminActions.removeAttribute("hidden");
+                    setTimeout(function () { return document.addEventListener("click", hideItemAdminActions_1); });
+                };
+                itemBanButton.onclick = function (_) { return banUser(item.user.name, prefix, item._id); };
+                itemKickButton.onclick = function (_) { return kickUser(prefix, item._id); };
+                stickyButton.removeAttribute("hidden");
+                stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
+                stickyButton.onclick = function (_) { return confirm("Are you sure you want to " + (item.sticky
+                    ? "mark this " + itemSingular(collection) + " as sticky"
+                    : "remove sticky from this " + itemSingular(collection)))
+                    ? setSticky(item.sticky)
+                        .then(function (_) { return history.go(); })
                         .catch(handleError)
                     : undefined; };
-                if (item.permission === "admin") {
-                    var hideItemAdminActions_1 = function () {
-                        itemAdminActions.setAttribute("hidden", "");
-                        document.removeEventListener("click", hideItemAdminActions_1);
-                    };
-                    itemPhoto.onclick = function (_) {
-                        itemAdminActions.removeAttribute("hidden");
-                        setTimeout(function () { return document.addEventListener("click", hideItemAdminActions_1); });
-                    };
-                    itemBanButton.onclick = function (_) { return banUser(item.user.name, prefix, item._id); };
-                    itemKickButton.onclick = function (_) { return kickUser(prefix, item._id); };
-                    stickyButton.removeAttribute("hidden");
-                    stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
-                    stickyButton.onclick = function (_) { return confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar))
-                        ? setSticky(item.sticky)
-                            .then(function (_) { return history.go(); })
-                            .catch(handleError)
-                        : undefined; };
-                }
             }
-            var content = Object.keys(item.content)
-                .reduce(function (content, k) { return content + ("<div class=\"" + k + "\">" + item.content[k] + "</div>"); });
-            itemContent.innerHTML = content;
-            listReplys(page)
-                .then(function (_a) {
-                var items = _a.items, numberOfPages = _a.numberOfPages;
-                if (numberOfPages === 1 || numberOfPages === 0) {
-                    pagination.setAttribute("hidden", "");
-                }
-                else {
-                    initPagination(page, numberOfPages, listReplys, handleError);
-                }
-                if (items.length === 0) {
-                    noReplys.removeAttribute("hidden");
-                }
-            })
-                .catch(handleError);
+        }
+        var content = Object.keys(item.content)
+            .reduce(function (content, k) { return content + ("<div class=\"" + k + "\">" + item.content[k] + "</div>"); }, "");
+        itemContent.innerHTML = content;
+    };
+    var listReplys = function (page) {
+        replySpinnerTimeoutId = setTimeout(function () { return replysSpinner.removeAttribute("hidden"); }, 100);
+        replysEl.innerHTML = "";
+        return replyList.getItems(page)
+            .then(function (value) {
+            clearTimeout(replySpinnerTimeoutId);
+            replysSpinner.setAttribute("hidden", "");
+            var items = value.items, numberOfPages = value.numberOfPages;
+            items.map(function (reply) { return createReplyElement(reply); })
+                .forEach(function (replyEl) { return replysEl.appendChild(replyEl); });
+            return value;
+        });
+    };
+    getItem().then(function (item) {
+        if (item.permission === "none") {
+            wasUnset = true;
+        }
+        return item;
+    }).then(showItem).catch(handleError);
+    userService.user.subscribe(function (user) {
+        userId = user ? user.id : null;
+        replyList.setUserId(userId);
+        if (userId && wasUnset) {
+            localStorage.removeItem("/item" + prefix + "/" + id);
+        }
+        getItem().then(showItem).catch(handleError);
+        listReplys(page)
+            .then(function (_a) {
+            var items = _a.items, numberOfPages = _a.numberOfPages;
+            if (numberOfPages === 1 || numberOfPages === 0) {
+                pagination.setAttribute("hidden", "");
+            }
+            else {
+                initPagination(page, numberOfPages, listReplys, handleError);
+            }
+            if (items.length === 0) {
+                noReplys.removeAttribute("hidden");
+            }
         })
             .catch(handleError);
         if (!user) {

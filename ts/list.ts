@@ -1,6 +1,5 @@
 import "./common";
 import { List } from "./api-list";
-import { itemSinglar } from "./api-globals";
 import { userService } from "./globals";
 import { Item } from "./types/item";
 import { initPagination } from "./pagination";
@@ -28,7 +27,7 @@ const createListItemElement = (item: Item) => {
     itemName.innerText = item.user.name;
     itemDate.innerText = moment(item.date).fromNow();
     itemTitle.innerText = item.title;
-    itemTitle.href = `${itemSinglar}.html?id=${item._id}`;
+    itemTitle.href = `item.html?id=${item._id}`;
 
     return el;
 }
@@ -80,7 +79,7 @@ window.addEventListener("load", () => {
             .then(stickyItems => {
                 stickyItems.items.map(createListItemElement).forEach(itemEl => stickyListEl.appendChild(itemEl));
 
-                return normalList.getItems(page, stickyItems.items.length)
+                return normalList.getItems(page)
                     .then(normalItems => {
                         clearTimeout(timeoutId);
                         spinner.setAttribute("hidden", "");

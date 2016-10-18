@@ -7,7 +7,8 @@ head: >
 ---
 
 <script>
-    const prefix = "{{ site.data[page.group].baseUrl }}/questions";
+    const collection = "questions";
+    const prefix = "{{ site.data[page.group].baseUrl }}/" + collection;
 </script>
 <script src="/js/item.roll.js" async defer></script>
 

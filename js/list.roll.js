@@ -166,7 +166,7 @@ window.addEventListener("load", function () {
 });
 
 var HOST = "http://localhost:8000";
-var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
+
 
 var setItemToCache = function (prefix, item) { return localStorage.setItem("/item" + prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
 var getItemFromCache = function (prefix, id) { return JSON.parse(localStorage.getItem("/item" + prefix.replace("/sticky", "") + "/" + id)); };
@@ -181,13 +181,11 @@ var getPage = function () {
 var List = (function () {
     function List(prefix) {
         this.prefix = prefix;
-        this.userId = "UNSET";
     }
     List.prototype.setUserId = function (userId) { this.userId = userId; };
-    List.prototype.getItems = function (page, offset) {
+    List.prototype.getItems = function (page) {
         var _this = this;
-        if (offset === void 0) { offset = 0; }
-        return this.listItems(page, offset).then(function (_a) {
+        return this.listItems(page).then(function (_a) {
             var ids = _a.ids, numberOfPages = _a.numberOfPages;
             var cachedItems = [];
             var newIds = [];
@@ -206,9 +204,9 @@ var List = (function () {
             });
         });
     };
-    List.prototype.listItems = function (page, offset) {
-        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset, {
-            headers: { "Authorization": this.userId }
+    List.prototype.listItems = function (page) {
+        return fetch(HOST + this.prefix + "/list/" + page, {
+            headers: { "Authorization": this.userId || "UNSET" }
         }).then(function (res) {
             if (!res.ok)
                 return res.text().then(function (text) { throw text; });
@@ -220,7 +218,7 @@ var List = (function () {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": this.userId
+                "Authorization": this.userId || "UNSET"
             },
             body: JSON.stringify(ids)
         }).then(function (res) {
@@ -309,7 +307,7 @@ var createListItemElement = function (item) {
     itemName.innerText = item.user.name;
     itemDate.innerText = moment(item.date).fromNow();
     itemTitle.innerText = item.title;
-    itemTitle.href = itemSinglar + ".html?id=" + item._id;
+    itemTitle.href = "item.html?id=" + item._id;
     return el;
 };
 window.addEventListener("load", function () {
@@ -347,7 +345,7 @@ window.addEventListener("load", function () {
         return stickyList.getItems(page)
             .then(function (stickyItems) {
             stickyItems.items.map(createListItemElement).forEach(function (itemEl) { return stickyListEl.appendChild(itemEl); });
-            return normalList.getItems(page, stickyItems.items.length)
+            return normalList.getItems(page)
                 .then(function (normalItems) {
                 clearTimeout(timeoutId);
                 spinner.setAttribute("hidden", "");

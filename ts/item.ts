@@ -1,5 +1,5 @@
 import "./common";
-import { HOST, getItemFromCache, setItemToCache, itemSinglar, formToJson, getId, getPage } from "./api-globals";
+import { HOST, getItemFromCache, setItemToCache, getItemSingular, formToJson, getId, getPage } from "./api-globals";
 import { List } from "./api-list";
 import { userService } from "./globals";
 import { Item, Reply } from "./types/item";
@@ -7,7 +7,10 @@ import { User } from "./types/user";
 import { initPagination } from "./pagination";
 
 declare const prefix: string;
-let userId = "UNSET";
+declare const collection: "questions" | "tips-and-tricks" | "trip-reports";
+let userId: string = null;
+let wasUnset = false;
+const itemSingular = getItemSingular(collection);
 
 window.addEventListener("load", () => {
     const replysEl = document.querySelector(".replys");
@@ -38,6 +41,9 @@ window.addEventListener("load", () => {
     const kickUserMeasurement = document.querySelector(".kick-user-prompt__measurement") as HTMLSelectElement;
     const kickUserButton = document.querySelector(".kick-user-prompt__button") as HTMLButtonElement;
     const kickUserCancle = document.querySelector(".kick-user-prompt__cancle") as HTMLButtonElement;
+    const breadcrumbSection = document.querySelector(".breadcrumb p");
+
+    breadcrumbSection.innerHTML = getItemSingular(collection);
 
     const handleError = (error: any) => {
         console.error(error);
@@ -70,8 +76,11 @@ window.addEventListener("load", () => {
             if (!res.ok) return res.text().then(text => {throw text});
         })
 
-    const getItem = () =>
-        Promise.resolve(getItemFromCache(prefix, id) as Item)
+    let itemSpinnerTimeoutId: number
+    const getItem = () => {
+        itemSpinnerTimeoutId = setTimeout(() => itemSpinner.removeAttribute("hidden"), 100);
+
+        return Promise.resolve(getItemFromCache(prefix, id) as Item)
             .then(item => {
                 if (item && item.content) return item;
 
@@ -89,9 +98,11 @@ window.addEventListener("load", () => {
                         }
                     })
             });
+    }
+        
 
     const setSticky = (sticky: boolean = false) => {
-        localStorage.removeItem(`${prefix}/${id}`)
+        localStorage.removeItem(`/item${prefix}/${id}`);
 
         return fetch(`${HOST}${prefix}/${id}/sticky`, {
             method: "POST",
@@ -249,97 +260,107 @@ window.addEventListener("load", () => {
         fr.readAsDataURL(uploadedImage);
     })
 
-    const itemSpinnerTimeoutId = setTimeout(() => itemSpinner.removeAttribute("hidden"), 100);
+    
+    const showItem = (item: Item) => {
+        clearTimeout(itemSpinnerTimeoutId);
+        itemSpinner.setAttribute("hidden", "");
 
-    userService.user.subscribe(user => {
-        userId = user ? user.id : "UNSET";
-        replyList.setUserId(userId);
+        itemPhoto.src = item.user.photo;
+        itemName.innerHTML = item.user.name;
+        itemDate.innerHTML = moment(item.date).fromNow();
+        itemTitle.innerHTML = item.title;
 
+        if (item.permission === "you" || item.permission === "admin") {
+            buttons.removeAttribute("hidden");
 
-        const listReplys = (page:number) => {
-            replySpinnerTimeoutId = setTimeout(() => replysSpinner.removeAttribute("hidden"), 100);
-            replysEl.innerHTML = "";
+            deleteBtn.onclick = _ => confirm(`Are you sure you want do delete this ${itemSingular}?`) 
+                ? deleteItem(id, prefix)
+                    .then(_ => location.href = location.href.replace(/\w+\.html.*?$/, ""))
+                    .catch(handleError)
+                : undefined;
 
-            return replyList.getItems(page, 0)
-                .then((value) => {
-                    clearTimeout(replySpinnerTimeoutId);
-                    replysSpinner.setAttribute("hidden", "");
+            if (item.permission === "admin") {
+                const hideItemAdminActions = () => {
+                    itemAdminActions.setAttribute("hidden", "");
 
-                    const { items, numberOfPages } = value;
+                    document.removeEventListener("click", hideItemAdminActions);
+                }
+                itemPhoto.onclick = _ => {
+                    itemAdminActions.removeAttribute("hidden")
 
-                    items.map(reply => createReplyElement(reply))
-                        .forEach(replyEl => replysEl.appendChild(replyEl));
+                    setTimeout(() => document.addEventListener("click", hideItemAdminActions));
+                };
 
-                    return value;
-                });
+                itemBanButton.onclick = _ => banUser(item.user.name, prefix, item._id);
+
+                itemKickButton.onclick = _ => kickUser(prefix, item._id);
+
+                stickyButton.removeAttribute("hidden");
+
+                stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
+
+                stickyButton.onclick = _ => confirm("Are you sure you want to " + (item.sticky 
+                    ? "mark this " + itemSingular + " as sticky" 
+                    : "remove sticky from this " + itemSingular)) 
+                    ? setSticky(item.sticky)
+                        .then(_ => history.go())
+                        .catch(handleError)
+                    : undefined
+            }
         }
 
-        getItem()
-            .then(item => {
-                clearTimeout(itemSpinnerTimeoutId);
-                itemSpinner.setAttribute("hidden", "");
+        const content = Object.keys(item.content)
+            .reduce((content, k) => content + `<div class="${k}">${item.content[k]}</div>`, "");
 
-                itemPhoto.src = item.user.photo;
-                itemName.innerHTML = item.user.name;
-                itemDate.innerHTML = moment(item.date).fromNow();
-                itemTitle.innerHTML = item.title;
+        itemContent.innerHTML = content;
+    }
+    const listReplys = (page:number) => {
+        replySpinnerTimeoutId = setTimeout(() => replysSpinner.removeAttribute("hidden"), 100);
+        replysEl.innerHTML = "";
 
-                if (item.permission === "you" || item.permission === "admin") {
-                    buttons.removeAttribute("hidden");
+        return replyList.getItems(page)
+            .then((value) => {
+                clearTimeout(replySpinnerTimeoutId);
+                replysSpinner.setAttribute("hidden", "");
 
-                    deleteBtn.onclick = _ => confirm(`Are you sure you want do delete this ${itemSinglar}?`) 
-                        ? deleteItem(id, prefix)
-                            .then(_ => location.href = location.href.replace(/\w+\.html.*?$/, ""))
-                            .catch(handleError)
-                        : undefined;
+                const { items, numberOfPages } = value;
 
-                    if (item.permission === "admin") {
-                        const hideItemAdminActions = () => {
-                            itemAdminActions.setAttribute("hidden", "");
+                items.map(reply => createReplyElement(reply))
+                    .forEach(replyEl => replysEl.appendChild(replyEl));
 
-                            document.removeEventListener("click", hideItemAdminActions);
-                        }
-                        itemPhoto.onclick = _ => {
-                            itemAdminActions.removeAttribute("hidden")
+                return value;
+            });
+    }
 
-                            setTimeout(() => document.addEventListener("click", hideItemAdminActions));
-                        };
+    getItem().then(item => {
+        if (item.permission === "none") {
+            wasUnset = true;
+        }
 
-                        itemBanButton.onclick = _ => banUser(item.user.name, prefix, item._id);
+        return item;
+    }).then(showItem).catch(handleError);
 
-                        itemKickButton.onclick = _ => kickUser(prefix, item._id);
+    userService.user.subscribe(user => {
+        userId = user ? user.id : null;
+        replyList.setUserId(userId);
 
-                        stickyButton.removeAttribute("hidden");
+        if (userId && wasUnset) {
+            localStorage.removeItem(`/item${prefix}/${id}`);
+        }
+        getItem().then(showItem).catch(handleError);
 
-                        stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
-
-                        stickyButton.onclick = _ => confirm("Are you sure you want to " + (item.sticky ? "mark this " + itemSinglar + " as sticky" : "remove sticky from this " + itemSinglar)) 
-                            ? setSticky(item.sticky)
-                                .then(_ => history.go())
-                                .catch(handleError)
-                            : undefined
-                    }
+        listReplys(page)
+            .then(({ items, numberOfPages }) => {
+                if (numberOfPages === 1 || numberOfPages === 0) {
+                    pagination.setAttribute("hidden", "");
                 }
-                
-                const content = Object.keys(item.content)
-                    .reduce((content, k) => content + `<div class="${k}">${item.content[k]}</div>`);
+                else {
+                    initPagination(page, numberOfPages, listReplys, handleError);
+                }
 
-                itemContent.innerHTML = content;
-
-                listReplys(page)
-                    .then(({ items, numberOfPages }) => {
-                        if (numberOfPages === 1 || numberOfPages === 0) {
-                            pagination.setAttribute("hidden", "");
-                        }
-                        else {
-                            initPagination(page, numberOfPages, listReplys, handleError);
-                        }
-
-                        if (items.length === 0) {
-                            noReplys.removeAttribute("hidden");
-                        }
-                    })
-                    .catch(handleError);
+                if (items.length === 0) {
+                    noReplys.removeAttribute("hidden");
+                }
             })
             .catch(handleError);
 

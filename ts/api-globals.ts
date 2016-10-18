@@ -1,5 +1,12 @@
 export const HOST = "http://localhost:8000"
-export const itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
+
+const collectionMap: { [key: string]: string } = {
+    "questions": "question",
+    "tips-and-tricks": "tip",
+    "trip-reports": "report"
+};
+export const getItemSingular = (collection: "questions" | "tips-and-tricks" | "trip-reports") => collectionMap[collection];
+
 export const formToJson = (form: HTMLFormElement): { [key: string]: any} => {
     const formData = new FormData(form);
     const json: { [key: string]: any } = {};

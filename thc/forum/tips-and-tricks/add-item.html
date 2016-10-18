@@ -1,0 +1,16 @@
+---
+layout: group
+group: thc
+head: >
+    <link rel="stylesheet" href="/css/add-item.css" async/>
+---
+
+<script>
+    const prefix = "{{ site.data[page.group].baseUrl }}/tips-and-tricks";
+    const fields = [
+        { name: "content", type: "textarea", required: true }
+    ];
+</script>
+<script src="/js/add-item.roll.js" async defer></script>
+
+{% include add-item.html %}

@@ -166,7 +166,7 @@ window.addEventListener("load", function () {
 });
 
 var HOST = "http://localhost:8000";
-var itemSinglar = location.pathname.match(/\/(\w+)\/(?=([\w-]+\.html.*?)?$)/)[1].replace(/s$/, "");
+
 var formToJson = function (form) {
     var formData = new FormData(form);
     var json = {};
@@ -226,7 +226,7 @@ window.addEventListener("load", function () {
         var onAddItem = function (event) {
             event.preventDefault();
             var formData = formToJson(form);
-            var otherFormData = Object.keys(formData).filter(function (k) { return k === "title"; })
+            var otherFormData = Object.keys(formData).filter(function (k) { return k !== "title"; })
                 .reduce(function (obj, k) {
                 obj[k] = formData[k];
                 return obj;

@@ -71,7 +71,7 @@ window.addEventListener("load", () => {
             event.preventDefault();
 
             const formData = formToJson(form) as { [key: string]: any }
-            const otherFormData = Object.keys(formData).filter(k => k === "title")
+            const otherFormData = Object.keys(formData).filter(k => k !== "title")
                 .reduce((obj, k) => {
                     obj[k] = formData[k]
                     return obj;

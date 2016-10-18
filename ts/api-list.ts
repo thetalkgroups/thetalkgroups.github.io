@@ -1,14 +1,14 @@
 import { HOST, getItemFromCache, setItemToCache } from "./api-globals"
 
 export class List<a extends { _id: string }> {
-    private userId = "UNSET"
+    private userId: string
 
     public constructor(private prefix: string) {}
 
     setUserId(userId: string) { this.userId = userId }
 
-    public getItems(page: number, offset: number = 0): Promise<{ items: a[], numberOfPages: number }> {
-        return this.listItems(page, offset).then(({ ids, numberOfPages }) => {
+    public getItems(page: number): Promise<{ items: a[], numberOfPages: number }> {
+        return this.listItems(page).then(({ ids, numberOfPages }) => {
             const cachedItems: a[] = [];
             const newIds: string[] = [];
 
@@ -31,9 +31,9 @@ export class List<a extends { _id: string }> {
         })
     }
 
-    private listItems(page: number, offset: number): Promise<{ ids: string[], numberOfPages: number }> {
-        return fetch(HOST + this.prefix + "/list/" + page + "-" + offset, {
-            headers: { "Authorization": this.userId }
+    private listItems(page: number): Promise<{ ids: string[], numberOfPages: number }> {
+        return fetch(HOST + this.prefix + "/list/" + page, {
+            headers: { "Authorization": this.userId || "UNSET" }
         }).then(res => {
             if (!res.ok) return res.text().then(text => {throw text});
 
@@ -46,7 +46,7 @@ export class List<a extends { _id: string }> {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json", 
-                "Authorization": this.userId 
+                "Authorization": this.userId || "UNSET"
             }, 
             body: JSON.stringify(ids)
         }).then(res => {
