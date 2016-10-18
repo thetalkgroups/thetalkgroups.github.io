@@ -1,10 +1,11 @@
 import { getPage } from "./api-globals"
 
 export const initPagination = (page: number, numberOfPages: number, refreshList: (page:number) => Promise<any>, handleError: (error: any) => void) => {
+    let numberOfNavigations = 0;
     const prev = document.querySelector(".pagination__prev") as HTMLAnchorElement;
     const next = document.querySelector(".pagination__next") as HTMLAnchorElement;
     const pageEl = document.querySelector(".pagination__page");
-    const updatePage = () => {
+    const updatePageEl = () => {
         if (page === 1)
             prev.classList.add("disabled");
         else
@@ -19,15 +20,25 @@ export const initPagination = (page: number, numberOfPages: number, refreshList:
 
         pageEl.innerHTML = page + " of " + numberOfPages;
     };
-    const urlWithoutPage = getUrlWithoutPage();
 
-    window.addEventListener("popstate", () => location.reload());
+    window.addEventListener("popstate", () => {
+        if (numberOfNavigations === 0) {
+            history.back();
+        }
+        else {
+            numberOfNavigations -= 1;
+            page = getPage();
+            updatePageEl();
+            refreshList(page).catch(handleError);
+        }
+    })
 
     prev.onclick = () => {
         if (prev.classList.contains("disabled")) return;
 
         page -= 1;
-        updatePage();
+        updatePageEl();
+        numberOfNavigations += 1;
         refreshList(page).catch(handleError);
     }
     
@@ -35,20 +46,14 @@ export const initPagination = (page: number, numberOfPages: number, refreshList:
         if (next.classList.contains("disabled")) return;
 
         page += 1;
-        updatePage();
+        updatePageEl();
+        numberOfNavigations += 1;
         refreshList(page).catch(handleError);
     };
 
-    updatePage()
+    updatePageEl();
 }
 
-const getUrlWithoutPage = () => {
-    const url = new URL(location.href);
-
-    url.search = url.search.replace(/page=\d+/, "");
-
-    return url.toString();
-}
 const getUrlWithPage = (page: number) => {
     const url = new URL(location.href);
 

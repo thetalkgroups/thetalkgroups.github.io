@@ -247,10 +247,11 @@ var List = (function () {
 }());
 
 var initPagination = function (page, numberOfPages, refreshList, handleError) {
+    var numberOfNavigations = 0;
     var prev = document.querySelector(".pagination__prev");
     var next = document.querySelector(".pagination__next");
     var pageEl = document.querySelector(".pagination__page");
-    var updatePage = function () {
+    var updatePageEl = function () {
         if (page === 1)
             prev.classList.add("disabled");
         else
@@ -262,28 +263,34 @@ var initPagination = function (page, numberOfPages, refreshList, handleError) {
         history.pushState(null, null, getUrlWithPage(page));
         pageEl.innerHTML = page + " of " + numberOfPages;
     };
-    var urlWithoutPage = getUrlWithoutPage();
-    window.addEventListener("popstate", function () { return location.reload(); });
+    window.addEventListener("popstate", function () {
+        if (numberOfNavigations === 0) {
+            history.back();
+        }
+        else {
+            numberOfNavigations -= 1;
+            page = getPage();
+            updatePageEl();
+            refreshList(page).catch(handleError);
+        }
+    });
     prev.onclick = function () {
         if (prev.classList.contains("disabled"))
             return;
         page -= 1;
-        updatePage();
+        updatePageEl();
+        numberOfNavigations += 1;
         refreshList(page).catch(handleError);
     };
     next.onclick = function () {
         if (next.classList.contains("disabled"))
             return;
         page += 1;
-        updatePage();
+        updatePageEl();
+        numberOfNavigations += 1;
         refreshList(page).catch(handleError);
     };
-    updatePage();
-};
-var getUrlWithoutPage = function () {
-    var url = new URL(location.href);
-    url.search = url.search.replace(/page=\d+/, "");
-    return url.toString();
+    updatePageEl();
 };
 var getUrlWithPage = function (page) {
     var url = new URL(location.href);
