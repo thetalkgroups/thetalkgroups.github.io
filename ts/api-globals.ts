@@ -1,4 +1,4 @@
-export const HOST = "http://localhost:8000"
+export const HOST = "http://83.93.98.21:8000";
 
 const collectionMap: { [key: string]: string } = {
     "questions": "question",
