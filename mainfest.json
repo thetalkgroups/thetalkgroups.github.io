@@ -1,0 +1,9 @@
+{
+  "name": "The Talk Groups",
+  "short_name": "talk groups",
+  "start_url": "/index.html?view",
+  "display": "standalone",
+  "background_color": "#FAFAFA",
+  "theme_color": "#fff",
+  "description": "drug forums for all sorts of drugs"
+}
