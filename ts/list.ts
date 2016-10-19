@@ -53,22 +53,6 @@ window.addEventListener("load", () => {
         askAQuestion.setAttribute("hidden", "");
     }
 
-    userService.user
-        .subscribe(user => {
-            const userId = user ? user.id : "UNSET"
-            stickyList.setUserId(userId);
-            normalList.setUserId(userId);
-            
-            if (!user) {
-                askAQuestion.hidden = true;
-
-                return;
-            }
-
-            askAQuestion.hidden = false;
-        });
-
-
     const refreshList = (page: number) => {
         const timeoutId = setTimeout(() => spinner.removeAttribute("hidden"), 100);
         
@@ -101,4 +85,19 @@ window.addEventListener("load", () => {
             }
         })
         .catch(handleError);
+
+    userService.user
+        .subscribe(user => {
+            const userId = user ? user.id : "UNSET"
+            stickyList.setUserId(userId);
+            normalList.setUserId(userId);
+            
+            if (!user) {
+                askAQuestion.hidden = true;
+
+                return;
+            }
+
+            askAQuestion.hidden = false;
+        });
 });
