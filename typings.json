@@ -1,8 +1,8 @@
 {
-  "dependencies": {},
   "globalDependencies": {
     "es6-shim": "registry:dt/es6-shim#0.31.2+20160602141504",
     "moment": "registry:dt/moment#2.11.1+20160829143156",
+    "service_worker_api": "registry:dt/service_worker_api#0.0.0+20160803024618",
     "whatwg-fetch": "registry:dt/whatwg-fetch#0.0.0+20161004182750"
   }
 }

@@ -74,6 +74,10 @@ var isParentOf = function (target, selector) {
     return isParentOf(target.parentNode, selector);
 };
 
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
+        .then(function () { return console.log("service worker registered"); });
+}
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");

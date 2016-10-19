@@ -74,6 +74,10 @@ var isParentOf = function (target, selector) {
     return isParentOf(target.parentNode, selector);
 };
 
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
+        .then(function () { return console.log("service worker registered"); });
+}
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");
@@ -165,13 +169,13 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST = "http://localhost:8000";
+var HOST$1 = "http://83.93.98.21:8000";
 var collectionMap = {
     "questions": "question",
     "tips-and-tricks": "tip",
     "trip-reports": "report"
 };
-var itemSingular = function (collection) { return collectionMap[collection]; };
+var getItemSingular = function (collection) { return collectionMap[collection]; };
 var formToJson = function (form) {
     var formData = new FormData(form);
     var json = {};
@@ -224,7 +228,7 @@ var List = (function () {
         });
     };
     List.prototype.listItems = function (page) {
-        return fetch(HOST + this.prefix + "/list/" + page, {
+        return fetch(HOST$1 + this.prefix + "/list/" + page, {
             headers: { "Authorization": this.userId || "UNSET" }
         }).then(function (res) {
             if (!res.ok)
@@ -233,7 +237,7 @@ var List = (function () {
         });
     };
     List.prototype.fetchItems = function (ids) {
-        return fetch(HOST + this.prefix + "/", {
+        return fetch(HOST$1 + this.prefix + "/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -311,6 +315,7 @@ var getUrlWithPage = function (page) {
 
 var userId = null;
 var wasUnset = false;
+var itemSingular = getItemSingular(collection);
 window.addEventListener("load", function () {
     var replysEl = document.querySelector(".replys");
     var itemHeader = document.querySelector(".item__header");
@@ -341,7 +346,7 @@ window.addEventListener("load", function () {
     var kickUserButton = document.querySelector(".kick-user-prompt__button");
     var kickUserCancle = document.querySelector(".kick-user-prompt__cancle");
     var breadcrumbSection = document.querySelector(".breadcrumb p");
-    breadcrumbSection.innerHTML = itemSingular(collection);
+    breadcrumbSection.innerHTML = getItemSingular(collection);
     var handleError = function (error) {
         console.error(error);
         errorEl.removeAttribute("hidden");
@@ -539,7 +544,7 @@ window.addEventListener("load", function () {
         itemTitle.innerHTML = item.title;
         if (item.permission === "you" || item.permission === "admin") {
             buttons.removeAttribute("hidden");
-            deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSingular(collection) + "?")
+            deleteBtn.onclick = function (_) { return confirm("Are you sure you want do delete this " + itemSingular + "?")
                 ? deleteItem(id, prefix)
                     .then(function (_) { return location.href = location.href.replace(/\w+\.html.*?$/, ""); })
                     .catch(handleError)
@@ -558,8 +563,8 @@ window.addEventListener("load", function () {
                 stickyButton.removeAttribute("hidden");
                 stickyButton.innerHTML = item.sticky ? "remove sticky" : "mark as sticky";
                 stickyButton.onclick = function (_) { return confirm("Are you sure you want to " + (item.sticky
-                    ? "mark this " + itemSingular(collection) + " as sticky"
-                    : "remove sticky from this " + itemSingular(collection)))
+                    ? "mark this " + itemSingular + " as sticky"
+                    : "remove sticky from this " + itemSingular))
                     ? setSticky(item.sticky)
                         .then(function (_) { return history.go(); })
                         .catch(handleError)

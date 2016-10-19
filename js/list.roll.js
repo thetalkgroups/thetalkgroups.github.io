@@ -74,6 +74,10 @@ var isParentOf = function (target, selector) {
     return isParentOf(target.parentNode, selector);
 };
 
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
+        .then(function () { return console.log("service worker registered"); });
+}
 window.addEventListener("load", function () {
     var navigation = document.querySelector(".navigation");
     var header = document.querySelector(".header");
@@ -165,7 +169,7 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST = "http://localhost:8000";
+var HOST = "http://83.93.98.21:8000";
 
 
 var setItemToCache = function (prefix, item) { return localStorage.setItem("/item" + prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };
