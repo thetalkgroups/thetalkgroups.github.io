@@ -169,7 +169,7 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST = "http://83.93.98.21:8000";
+var HOST = "https://83.93.98.21:8000";
 
 
 var setItemToCache = function (prefix, item) { return localStorage.setItem("/item" + prefix.replace("/sticky", "") + "/" + item._id, JSON.stringify(item)); };

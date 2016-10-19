@@ -169,7 +169,7 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST$1 = "http://83.93.98.21:8000";
+var HOST = "https://83.93.98.21:8000";
 var collectionMap = {
     "questions": "question",
     "tips-and-tricks": "tip",
@@ -228,7 +228,7 @@ var List = (function () {
         });
     };
     List.prototype.listItems = function (page) {
-        return fetch(HOST$1 + this.prefix + "/list/" + page, {
+        return fetch(HOST + this.prefix + "/list/" + page, {
             headers: { "Authorization": this.userId || "UNSET" }
         }).then(function (res) {
             if (!res.ok)
@@ -237,7 +237,7 @@ var List = (function () {
         });
     };
     List.prototype.fetchItems = function (ids) {
-        return fetch(HOST$1 + this.prefix + "/", {
+        return fetch(HOST + this.prefix + "/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
