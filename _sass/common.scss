@@ -313,7 +313,7 @@ button {
         width: 240px;
         transform: translateX(103%);
         transition: transform .3s;
-        will-change: auto;
+        will-change: transform;
         z-index: 2;
     }
     .navigation:after {

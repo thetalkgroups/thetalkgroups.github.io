@@ -1,5 +1,5 @@
 import "./common";
-import { HOST, getItemFromCache, setItemToCache, getItemSingular, formToJson, getId, getPage } from "./api-globals";
+import { getItemFromCache, setItemToCache, getItemSingular, formToJson, getId, getPage, HOST } from "./api-globals";
 import { List } from "./api-list";
 import { userService } from "./globals";
 import { Item, Reply } from "./types/item";
@@ -8,6 +8,7 @@ import { initPagination } from "./pagination";
 
 declare const prefix: string;
 declare const collection: "questions" | "tips-and-tricks" | "trip-reports";
+
 let userId: string = null;
 let wasUnset = false;
 const itemSingular = getItemSingular(collection);

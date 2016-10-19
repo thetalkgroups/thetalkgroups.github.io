@@ -1,4 +1,4 @@
-import { HOST, getItemFromCache, setItemToCache } from "./api-globals"
+import { getItemFromCache, setItemToCache, HOST } from "./api-globals"
 
 export class List<a extends { _id: string }> {
     private userId: string

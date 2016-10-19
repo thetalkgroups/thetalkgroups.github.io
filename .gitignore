@@ -9,3 +9,5 @@ typings
 npm-debug.log
 *.js
 !*.roll.js
+!service-worker.js
+!sw-toolbox.js
