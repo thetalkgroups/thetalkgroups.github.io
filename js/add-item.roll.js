@@ -169,7 +169,7 @@ window.addEventListener("load", function () {
     userNameOnly.addEventListener("click", showUserCard);
 });
 
-var HOST = "http://83.93.98.21:8000";
+var HOST = "https://83.93.98.21:8000";
 
 var formToJson = function (form) {
     var formData = new FormData(form);
