@@ -2,8 +2,6 @@
 
 importScripts('sw-toolbox.js');
 
-toolbox.options.debug = true;
-
 toolbox.precache([
     "/",
     "/index.html", 
