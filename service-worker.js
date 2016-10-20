@@ -25,11 +25,11 @@ toolbox.precache([
     "/css/list.css",
     "/css/sign-in.css",
 
-    "/js/add-item.roll.js",
-    "/js/common.roll.js",
-    "/js/item.roll.js",
-    "/js/list.roll.js",
-    "/js/sign-in.roll.js"
+    "/js/add-item.roll.min.js",
+    "/js/common.roll.min.js",
+    "/js/item.roll.min.js",
+    "/js/list.roll.min.js",
+    "/js/sign-in.roll.min.js"
 ])
 
 toolbox.router.get("/", toolbox.cacheOnly);
