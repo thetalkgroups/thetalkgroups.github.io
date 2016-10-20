@@ -77,9 +77,8 @@ window.addEventListener("load", () => {
             if (!res.ok) return res.text().then(text => {throw text});
         })
 
-    let itemSpinnerTimeoutId: number
     const getItem = () => {
-        itemSpinnerTimeoutId = setTimeout(() => itemSpinner.removeAttribute("hidden"), 100);
+        const timeoutId = setTimeout(() => itemSpinner.removeAttribute("hidden"), 100);
 
         return Promise.resolve(getItemFromCache(prefix, id) as Item)
             .then(item => {
@@ -98,7 +97,8 @@ window.addEventListener("load", () => {
                             })
                         }
                     })
-            });
+            })
+            .then(item => ({ item, timeoutId }));
     }
         
 
@@ -262,8 +262,8 @@ window.addEventListener("load", () => {
     })
 
     
-    const showItem = (item: Item) => {
-        clearTimeout(itemSpinnerTimeoutId);
+    const showItem = (item: Item, timeoutId: number) => {
+        clearTimeout(timeoutId);
         itemSpinner.setAttribute("hidden", "");
 
         itemPhoto.src = item.user.photo;
@@ -333,13 +333,15 @@ window.addEventListener("load", () => {
             });
     }
 
-    getItem().then(item => {
-        if (item.permission === "none") {
+    getItem().then((value) => {
+        if (value.item.permission === "none") {
             wasUnset = true;
         }
 
-        return item;
-    }).then(showItem).catch(handleError);
+        return value;
+    })
+    .then(({ item, timeoutId }) => showItem(item, timeoutId))
+    .catch(handleError);
 
     userService.user.subscribe(user => {
         userId = user ? user.id : null;
@@ -348,7 +350,10 @@ window.addEventListener("load", () => {
         if (userId && wasUnset) {
             localStorage.removeItem(`/item${prefix}/${id}`);
         }
-        getItem().then(showItem).catch(handleError);
+        
+        getItem()
+            .then(({ item, timeoutId }) => showItem(item, timeoutId))
+            .catch(handleError);
 
         listReplys(page)
             .then(({ items, numberOfPages }) => {
