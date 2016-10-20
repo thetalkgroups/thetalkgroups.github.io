@@ -6,7 +6,10 @@ declare const headerImageHWRatio: number;
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
-        .then(() => console.log("service worker registered"))
+        .then((reg) => {
+            console.log("service worker registered")
+            reg.update();
+        });
 }
 
 window.addEventListener("load", () => {
