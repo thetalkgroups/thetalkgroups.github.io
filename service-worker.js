@@ -3,10 +3,16 @@
 importScripts('sw-toolbox.js');
 
 toolbox.precache([
-    "/",
-    "/index.html", 
     "/sign-in.html",
+    "/admin.html",
 
+    "/thc/forum/questions/add-item.html",
+    "/thc/forum/questions/index.html",
+    "/thc/forum/questions/item.html",
+    "/thc/forum/tips-and-tricks/add-item.html",
+    "/thc/forum/tips-and-tricks/index.html",
+    "/thc/forum/tips-and-tricks/item.html",
+    
     "/assets/static/facebook-logo.svg",
     "/assets/static/google-logo.svg",
     "/assets/static/ic_camera_alt_black_24px.svg",
@@ -32,12 +38,15 @@ toolbox.precache([
     "/js/sign-in.roll.min.js"
 ])
 
-toolbox.router.get("/", toolbox.cacheOnly);
-toolbox.router.get("/index.html", toolbox.cacheOnly);
-toolbox.router.get("/sign-in.html", toolbox.cacheOnly);
-toolbox.router.get("/assets/(.*)", toolbox.cacheOnly);
-toolbox.router.get("/(css|js)/(.*)", toolbox.cacheOnly);
 toolbox.router.get("*", toolbox.cacheFirst);
+
+toolbox.router.get("/", toolbox.networkOnly)
+toolbox.router.get("/*/index.html", toolbox.networkOnly)
+toolbox.router.get("/*/general-hr.html", toolbox.networkOnly)
+toolbox.router.get("/*/test-kits.html", toolbox.networkOnly)
+toolbox.router.get("/*/forum/index.html", toolbox.networkOnly)
+toolbox.router.get("/*/forum/harm-reduction.html", toolbox.networkOnly)
+toolbox.router.get("/*/forum/read-first.html", toolbox.networkOnly)
 
 toolbox.router.any("*", toolbox.networkOnly, { origin: "http://83.93.98.21:8000" });
 
