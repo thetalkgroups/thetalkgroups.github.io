@@ -2,6 +2,10 @@
 
 importScripts('sw-toolbox.js');
 
+self.addEventListener("install", event => {
+    self.skipWaiting();
+});
+
 toolbox.precache([
     "/sign-in.html",
     "/admin.html",
