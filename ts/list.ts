@@ -13,10 +13,10 @@ let page = 1;
 
 if (pageMatch) page = parseInt(pageMatch[1], 10) || 1;
 
+let listItemTemplate: HTMLTemplateElement;
 const createListItemElement = (item: Item) => {
-    const template = document.importNode((document.getElementById("list-item") as HTMLTemplateElement).content, true);
     const el = document.createElement("article");
-    el.appendChild(template)
+    el.appendChild(listItemTemplate.content.cloneNode(true))
 
     const itemName = el.querySelector(".list-item__name") as HTMLElement;
     const itemDate = el.querySelector(".list-item__date") as HTMLElement;
@@ -41,6 +41,7 @@ window.addEventListener("load", () => {
     const pagination = document.querySelector(".pagination");
     const errorEl = document.querySelector(".error");
     const errorMessage = document.querySelector(".error__message");
+    listItemTemplate = document.getElementById("list-item") as HTMLTemplateElement;
 
     const handleError = (error: any) => {
         console.error(error);
