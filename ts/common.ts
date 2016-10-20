@@ -7,8 +7,11 @@ declare const headerImageHWRatio: number;
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
         .then((reg) => {
-            console.log("service worker registered :)")
-            reg.update();
+            console.log("service worker registered");
+
+            reg.onupdatefound = () => {
+                console.log("new service worker found");
+            }
         });
 }
 else {
