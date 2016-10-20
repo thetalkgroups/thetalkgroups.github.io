@@ -1,4 +1,4 @@
-// 3
+// 1
 
 importScripts('sw-toolbox.js');
 
@@ -41,6 +41,7 @@ toolbox.precache([
 toolbox.router.get("*", toolbox.cacheFirst);
 
 toolbox.router.get("/", toolbox.networkOnly)
+toolbox.router.get("/index.html", toolbox.networkOnly)
 toolbox.router.get("/*/index.html", toolbox.networkOnly)
 toolbox.router.get("/*/general-hr.html", toolbox.networkOnly)
 toolbox.router.get("/*/test-kits.html", toolbox.networkOnly)
