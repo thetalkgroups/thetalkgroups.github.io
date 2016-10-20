@@ -4,18 +4,21 @@
   "description": "thetalkgroups forum",
   "main": "none",
   "devDependencies": {
+    "concurrently": "^3.1.0",
     "rollup": "^0.36.3",
     "rollup-watch": "^2.5.0",
     "typescript": "^2.0.3",
     "typings": "^1.4.0",
-    "concurrently": "^3.1.0"
+    "uglify-js": "^2.7.3"
   },
   "scripts": {
-    "postinstall": "typings install && npm run build && npm run roll",
-    "build": "tsc",
-    "build:w": "tsc -w",
-    "roll:w": "concurrent 'rollup -m -w -o js/common.roll.js js/common.js' 'rollup -m -w -o js/sign-in.roll.js js/sign-in.js' 'rollup -m -w -o js/item.roll.js js/item.js' 'rollup -m -w -o js/list.roll.js js/list.js' 'rollup -m -w -o js/add-item.roll.js js/add-item.js'",
-    "roll": "rollup -m -o js/common.roll.js js/common.js && rollup -m -o js/sign-in.roll.js js/sign-in.js && rollup -m -o js/item.roll.js js/item.js && rollup -m -o js/list.roll.js js/list.js && rollup -m -o js/add-item.roll.js js/add-item.js"
+    "postinstall": "typings install && npm run build",
+    "build": "npm run tsc || true && npm run roll && npm run minify",
+    "tsc": "tsc",
+    "tsc:w": "tsc -w",
+    "roll:w": "concurrent 'rollup -m -w -o js/common.roll.js js/common.js' 'rollup -m -w -o js/sign-in.roll.js js/sign-in.js' 'rollup -m -w -o js/item.roll.js js/item.js' 'rollup -m -w -o js/list.roll.js js/list.js' 'rollup -m -w -o js/add-item.roll.js js/add-item.js' 'rollup -m -w -o js/admin-list.roll.js js/admin-list.js'",
+    "roll": "rollup -m -o js/common.roll.js js/common.js && rollup -m -o js/sign-in.roll.js js/sign-in.js && rollup -m -o js/item.roll.js js/item.js && rollup -m -o js/list.roll.js js/list.js && rollup -m -o js/add-item.roll.js js/add-item.js && rollup -m -o js/admin-list.roll.js js/admin-list.js",
+    "minify": "uglifyjs -m -o js/common.roll.min.js js/common.roll.js && uglifyjs -m -o js/sign-in.roll.min.js js/sign-in.roll.js && uglifyjs -m -o js/item.roll.min.js js/item.roll.js && uglifyjs -m -o js/list.roll.min.js js/list.roll.js && uglifyjs -m -o js/add-item.roll.min.js js/add-item.roll.js && uglifyjs -m -o js/admin-list.roll.min.js js/admin-list.roll.js"
   },
   "author": "mathias hansen",
   "license": "UNLICENSED",

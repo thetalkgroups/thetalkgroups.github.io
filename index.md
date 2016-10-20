@@ -2,7 +2,7 @@
 layout: main
 head: >
     <link rel="stylesheet" href="/css/home.css" async/> 
-    <script src="/js/common.roll.js" async defer></script>
+    <script src="/js/common.roll.min.js" async defer></script>
 ---
 {::options parse_block_html="true" /}
 
