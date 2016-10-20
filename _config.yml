@@ -48,6 +48,8 @@ prose:
 
 env: production
 
+gems: [octopress-minify-html]
+
 html_press:
   unquoted_attributes: false
   drop_empty_values: false
