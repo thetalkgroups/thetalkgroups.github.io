@@ -1,4 +1,4 @@
-// 3
+// 1
 
 importScripts('sw-toolbox.js');
 
@@ -42,7 +42,6 @@ toolbox.precache([
     "/js/sign-in.roll.min.js"
 ])
 
-toolbox.router.get("*", toolbox.cacheFirst);
 
 toolbox.router.get("/", toolbox.networkOnly)
 toolbox.router.get("/index.html", toolbox.networkOnly)
@@ -52,6 +51,9 @@ toolbox.router.get("/*/test-kits.html", toolbox.networkOnly)
 toolbox.router.get("/*/forum/index.html", toolbox.networkOnly)
 toolbox.router.get("/*/forum/harm-reduction.html", toolbox.networkOnly)
 toolbox.router.get("/*/forum/read-first.html", toolbox.networkOnly)
+toolbox.router.get("/service-worker.js", toolbox.networkOnly)
+
+toolbox.router.get("*", toolbox.cacheFirst);
 
 toolbox.router.any("*", toolbox.networkOnly, { origin: "http://83.93.98.21:8000" });
 
