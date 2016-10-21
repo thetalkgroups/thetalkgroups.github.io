@@ -45,13 +45,16 @@ toolbox.precache([
 
 toolbox.router.get("/", toolbox.networkOnly)
 toolbox.router.get("/index.html", toolbox.networkOnly)
+toolbox.router.get("/*", toolbox.networkOnly)
+toolbox.router.get("/*/", toolbox.networkOnly)
 toolbox.router.get("/*/index.html", toolbox.networkOnly)
 toolbox.router.get("/*/general-hr.html", toolbox.networkOnly)
 toolbox.router.get("/*/test-kits.html", toolbox.networkOnly)
+toolbox.router.get("/*/forum", toolbox.networkOnly)
+toolbox.router.get("/*/forum/", toolbox.networkOnly)
 toolbox.router.get("/*/forum/index.html", toolbox.networkOnly)
 toolbox.router.get("/*/forum/harm-reduction.html", toolbox.networkOnly)
 toolbox.router.get("/*/forum/read-first.html", toolbox.networkOnly)
-toolbox.router.get("/service-worker.js", toolbox.networkOnly)
 
 toolbox.router.any("*", toolbox.networkOnly, { origin: "http://83.93.98.21:8000" });
 
