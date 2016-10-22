@@ -1,0 +1,33 @@
+---
+---
+@import "common";
+
+.user-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    margin-bottom: 16px;
+    border-bottom: 1px solid #E0E0E0;
+    padding: 16px 0;
+
+    header {
+        display: flex;
+        flex-direction: column;
+
+        margin-left: 16px;
+    }
+}
+
+.user-item::last-child {
+    border: none;
+}
+
+.user-item__photo {
+    width: 48px;
+    height: 48px;
+}
+
+.user-item__button, .user-item__release-time {
+    margin-left: 16px;
+}
