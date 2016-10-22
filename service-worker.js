@@ -10,8 +10,9 @@ self.addEventListener("install", event => {
 
 toolbox.precache([
     "/sign-in.html",
-    "/admin/index.html",
 
+    "/admin/index.html",
+    
     "/thc/forum/index.html",
     "/thc/forum/questions/add-item.html",
     "/thc/forum/questions/index.html",
