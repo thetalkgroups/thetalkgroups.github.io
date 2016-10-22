@@ -10,7 +10,7 @@ exclude: [
 
 defaults: 
     - values: 
-        head: <script src="js/common.roll.js" async defer></script>
+        head: <script src="js/common.min.js" async defer></script>
 
 sass:
     style: compressed
