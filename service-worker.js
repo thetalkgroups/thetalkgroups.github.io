@@ -70,7 +70,8 @@ const networkOnlyPaths = [
     "/(thc)/forum/read-first.html"
 ]
 
-networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache));
+networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache, { origin: "https://thetalkgroups.github.io" }));
+networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache, { origin: "https://localhost:4000" }));
 
 toolbox.router.any("*", toolbox.networkOnly, { origin: "http://83.93.98.21:8000" });
 
