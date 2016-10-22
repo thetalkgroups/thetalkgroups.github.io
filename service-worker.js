@@ -10,11 +10,9 @@ self.addEventListener("install", event => {
 
 toolbox.precache([
     "/sign-in.html",
-    "/admin",
     "/admin/",
     "/admin/index.html",
 
-    "/thc/forum",
     "/thc/forum/",
     "/thc/forum/index.html",
     "/thc/forum/questions/add-item.html",
@@ -71,7 +69,7 @@ const networkOnlyPaths = [
 ]
 
 networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache, { origin: "https://thetalkgroups.github.io" }));
-networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache, { origin: "https://localhost:4000" }));
+networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache, { origin: "http://localhost:4000" }));
 
 toolbox.router.any("*", toolbox.networkOnly, { origin: "http://83.93.98.21:8000" });
 
