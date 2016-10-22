@@ -8,6 +8,7 @@ typings
 *.map
 npm-debug.log
 *.js
-!*.roll.min.js
+!*.min.js
 !service-worker.js
 !sw-toolbox.js
+!build.js
