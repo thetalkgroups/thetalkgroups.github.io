@@ -4,15 +4,13 @@ importScripts('sw-toolbox.js');
 
 toolbox.options.debug = true;
 
-self.addEventListener("install", event => {
-    self.skipWaiting();
-});
+self.addEventListener("install", event => self.skipWaiting());
 
 toolbox.precache([
     "/sign-in.html",
 
     "/admin/index.html",
-    
+
     "/thc/forum/index.html",
     "/thc/forum/questions/add-item.html",
     "/thc/forum/questions/index.html",
@@ -67,8 +65,7 @@ const networkOnlyPaths = [
     "/(thc)/forum/read-first.html"
 ]
 
-networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache, { origin: "https://thetalkgroups.github.io" }));
-networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache, { origin: "http://localhost:4000" }));
+networkOnlyPaths.forEach(path => toolbox.router.get(path, limitedCache));
 
 toolbox.router.any("*", toolbox.networkOnly, { origin: "http://83.93.98.21:8000" });
 
