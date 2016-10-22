@@ -136,6 +136,7 @@ window.addEventListener("load", () => {
                 xhr.onerror = reject;
 
                 xhr.open("POST", HOST + "/files", true);
+                xhr.setRequestHeader("Authorization", userId)
                 xhr.send(fd);
             })
         }
