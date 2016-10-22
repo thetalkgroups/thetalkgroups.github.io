@@ -11,6 +11,22 @@
     display: none !important;
 }
 
+.add-item .input-container {
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.add-item .input-container.image {
+    flex-direction: row;
+    align-items: center;
+    margin: 8px 0;
+
+    input {
+        border: none;
+    }
+}
+
 .add-item label {
     font-size: 1.2em;
     margin-bottom: 8px;

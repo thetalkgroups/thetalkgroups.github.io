@@ -4,9 +4,8 @@ import { userService } from "./globals"
 import { Item } from "./types/item"
 import { User } from "./types/user"
 
-declare const fields: { name: string, type: string, required: boolean }[]
+declare const fields: { name: string, type: string, attributes: string }[]
 declare const prefix: string
-
 const addItem = (data: any, userId: string) =>
     fetch(HOST + prefix, {
         method: "PUT",
@@ -31,7 +30,6 @@ window.addEventListener("load", () => {
     const fieldsEl = form.querySelector(".fields");
     const errorEl = document.querySelector(".error");
 
-
     const handleError = (error: any) => {
         console.error(error);
 
@@ -41,19 +39,41 @@ window.addEventListener("load", () => {
         form.setAttribute("hidden", "");
     } 
 
-    fields.forEach(field => {
+    fields.forEach(({ name, type, attributes }) => {
+        const container = document.createElement("article");
         const label = document.createElement("label") as HTMLLabelElement;
-        const input = document.createElement(field.type) as HTMLInputElement;
+        let input: HTMLInputElement
 
-        label.innerText = field.name;
-        label.setAttribute("for", field.name);
+        container.className = "input-container";
 
-        input.id = field.name;
-        input.name = field.name;
-        input.required = field.required;
+        if (type === "image") {
+            input = document.createElement("input");
 
-        fieldsEl.appendChild(label);
-        fieldsEl.appendChild(input);
+            input.setAttribute("type", "file");
+            input.setAttribute("accept", "image/*");
+        }
+        else {
+            input = document.createElement(type) as HTMLInputElement;
+        }
+
+        label.innerText = name;
+        label.setAttribute("for", name);
+        
+        input.id = name;
+        input.name = name;
+        
+        if (attributes) {
+            attributes.split(" ").map(values => values.split("="))
+                .forEach(([ key, value ]) => input.setAttribute(key, (value || "").replace(/'/g, "")));
+        }
+
+        if (type === "image") {
+            container.classList.add("image");
+        }
+
+        container.appendChild(label);
+        container.appendChild(input);
+        fieldsEl.appendChild(container);
     })
 
     userService.user.subscribe(user => {
@@ -71,29 +91,55 @@ window.addEventListener("load", () => {
             event.preventDefault();
 
             const formData = formToJson(form) as { [key: string]: any }
-            const otherFormData = Object.keys(formData).filter(k => k !== "title")
+            const content = Object.keys(formData).filter(k => k !== "title")
                 .reduce((obj, k) => {
-                    obj[k] = formData[k]
+                    obj[k] = formData[k];
+
                     return obj;
                 }, {} as { [key: string]: any})
 
-            const data: Item = {
-                _id: undefined,
-                permission: undefined,
-                title: formData["title"] as string, 
-                user: { id: user.id, name: user.name, photo: user.photo },
-                content: otherFormData, 
-                fields: fields.map(field => field.name) 
-            };
+            const imagesUploaded = Promise.all(fields.filter(f => f.type === "image").map(f => f.name).map(name => {
+                const image = content[name];
 
-            addItem(data, user.id)
+                if (image.size) {
+                    const fd = new FormData();
+                    const xhr = new XMLHttpRequest();
+
+                    fd.append("image", image);
+
+                    return new Promise<void>((resolve, reject) => {
+                        xhr.onload = () => {
+                            (content as any)[name] = xhr.responseText;
+
+                            resolve();
+                        };
+                        xhr.onerror = reject;
+
+                        xhr.open("POST", HOST + "/files", true);
+                        xhr.setRequestHeader("Authorization", user.id)
+                        xhr.send(fd);
+                    })
+                }
+            }))
+
+            imagesUploaded
+                .then(() => {
+                    const data: Item = {
+                        _id: undefined,
+                        permission: undefined,
+                        title: formData["title"] as string, 
+                        user: { id: user.id, name: user.name, photo: user.photo, email: user.email },
+                        content, 
+                        fields: fields.map(field => field.name) 
+                    };
+
+                    addItem(data, user.id)
+                })
                 .then(() => location.href = location.href.replace(/[\w-]+\.html$/, ""))
                 .catch(error => console.error(error));
 
             return false;
         };
-
-        
 
         form.addEventListener("submit", onAddItem);
     });
