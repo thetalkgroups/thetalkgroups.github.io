@@ -3,6 +3,7 @@ import { clearItemsFromCahce, userService, isParentOf } from "./globals"
 import { User } from "./types/user";
 
 declare const headerImageHWRatio: number;
+declare const headerImageSrc: string;
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
@@ -32,6 +33,15 @@ window.addEventListener("load", () => {
     const userEmail = document.querySelector(".header__user__email") as HTMLElement;
     const userPhoto = document.querySelector(".header__user__photo") as HTMLImageElement;
     const signOutButton = document.querySelector(".header__user__sign-out-button");
+    const headerImg = document.querySelector(".header__img");
+
+    const img = document.createElement("img");
+    img.onload = () => {
+        header.insertBefore(img, headerImg);
+        headerImg.setAttribute("hidden", "");   
+    }
+    img.className = "header__img big";
+    img.src = headerImageSrc;  
 
     signInButton.hidden = false;
 
@@ -129,4 +139,15 @@ window.addEventListener("load", () => {
     closeNavButton.addEventListener("click", closeNav);
     signOutButton.addEventListener("click", signOut);
     userNameOnly.addEventListener("click", showUserCard);
+
+    // google analytics    
+    (function(i:any,s:any,o:any,g:any,r:any,a:any,m:any){
+    i['GoogleAnalyticsObject']=r;i[r]=i[r]|| function(){(i[r].q=
+    i[r].q||[]).push(arguments)},i[r].l=1*(new Date()as any);a=
+    s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;
+    a.src=g;m.parentNode.insertBefore(a,m)} as any)(window,document,
+    'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create','UA-85930130-1','auto');ga('send','pageview');
 });
+
+declare const ga: any
