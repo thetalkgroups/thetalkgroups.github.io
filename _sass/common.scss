@@ -88,7 +88,7 @@ button {
     left: 0;
 }
 .header__img.small {
-    transition: opacity .3s;
+    transition: opacity .25s cubic-bezier(0.4,0,1,1);
     opacity: 1;
 }
 .header__img.small[hidden] {
@@ -165,6 +165,7 @@ button {
 }
 .header__user[hidden] {
     opacity: 0;
+    pointer-events: none;
 }
 .header__user__photo {
     width: 64px;
