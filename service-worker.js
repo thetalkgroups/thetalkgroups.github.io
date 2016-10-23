@@ -1,4 +1,4 @@
-// 1
+// 2
 
 importScripts('sw-toolbox.js');
 
