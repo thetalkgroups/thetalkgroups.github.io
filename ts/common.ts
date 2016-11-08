@@ -5,6 +5,10 @@ import { User } from "./types/user";
 declare const headerImageHWRatio: number;
 declare const headerImageSrc: string;
 
+if (!("matches" in HTMLElement.prototype)) {
+    HTMLElement.prototype.matches = HTMLElement.prototype["msMatchesSelector"]
+}
+
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("/service-worker.js", { scope: "/" })
         .then((reg) => {
@@ -16,7 +20,7 @@ if ("serviceWorker" in navigator) {
         });
 }
 else {
-    console.log("service worker is not supported :-(");
+    console.warn("service worker is not supported :-(");
 }
 
 window.addEventListener("load", () => {
