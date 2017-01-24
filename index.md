@@ -4,6 +4,8 @@ head: >
     <link rel="stylesheet" href="/css/home.css" async/> 
     <script src="/js/common.min.js" async defer></script>
 ---
+{::options parse_block_html="true" /}
+
 <section class="home">
 
 ## who are we?
