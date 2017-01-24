@@ -4,7 +4,6 @@ head: >
     <link rel="stylesheet" href="/css/home.css" async/> 
     <script src="/js/common.min.js" async defer></script>
 ---
-
 <section class="home">
 
 ## who are we?
@@ -30,4 +29,5 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 ## what do we stand for?
 
 Nullams dictum urna elit. Integer mattis id elit ut scelerisque. Nullam non velit euismod, convallis sapien vitae, fringilla ex. Sed pellentesque lectus vehicula arcu dignissim feugiat. Nullam ut luctus justo. In lacinia condimentum commodo. Aliquam sapien velit, ultrices id sapien vitae, tristique rutrum erat. Cras blandit id ipsum quis pretium. Morbi maximus, ipsum et viverra lacinia, ex tortor egestas lacus, vehicula molestie erat libero id erat.
+
 </section>
